@@ -1,4 +1,4 @@
-# Low Stress Games
+# Calmer Games
 
 ## Mission
 
