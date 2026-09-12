@@ -19,19 +19,42 @@
 
   <canvas id="sky-canvas" aria-label="Star sky, drag to look around"></canvas>
 
-  <aside id="constellation-list-wrap">
-    <button id="list-toggle-btn" type="button" aria-expanded="true" aria-controls="constellation-list">
-      Constellations
-    </button>
+  <aside id="constellation-list-wrap" class="collapsed">
     <ul id="constellation-list"></ul>
   </aside>
 
   <noscript>This game needs JavaScript and a browser with WebGL support to run.</noscript>
 
   <div id="controls">
-    <button id="guide-btn" type="button" class="icon-btn active" data-tooltip="Constellations">✨</button>
-    <button id="globe-btn" type="button" class="icon-btn" data-tooltip="Globe view">🌐</button>
-    <button id="clear-btn" type="button" class="icon-btn" data-tooltip="Clear">✕</button>
+    <button id="guide-btn" type="button" class="icon-btn active" data-tooltip="Constellations">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M9 28 L17 12 L24 22 L32 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+        <circle cx="9" cy="28" r="2.4" fill="currentColor"/>
+        <circle cx="17" cy="12" r="2.8" fill="currentColor"/>
+        <circle cx="24" cy="22" r="2" fill="currentColor"/>
+        <circle cx="32" cy="9" r="2.4" fill="currentColor"/>
+      </svg>
+    </button>
+    <button id="globe-btn" type="button" class="icon-btn" data-tooltip="Globe view">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="20" cy="20" r="12" stroke="currentColor" stroke-width="1.6" opacity="0.85"/>
+        <ellipse cx="20" cy="20" rx="12" ry="4.5" stroke="currentColor" stroke-width="1.4" opacity="0.5"/>
+        <path d="M20 8 V32" stroke="currentColor" stroke-width="1.4" opacity="0.5"/>
+      </svg>
+    </button>
+    <button id="list-toggle-btn" type="button" class="icon-btn" aria-expanded="false" aria-controls="constellation-list" data-tooltip="Constellation list">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="11" cy="13" r="2.2" fill="currentColor" opacity="0.85"/>
+        <circle cx="11" cy="20" r="2.2" fill="currentColor" opacity="0.6"/>
+        <circle cx="11" cy="27" r="2.2" fill="currentColor" opacity="0.35"/>
+        <path d="M17 13 H31M17 20 H31M17 27 H31" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <button id="clear-btn" type="button" class="icon-btn" data-tooltip="Clear">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M12 12 L28 28M28 12 L12 28" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
+      </svg>
+    </button>
   </div>
 
   <div id="confirm-modal" class="modal-backdrop" hidden>

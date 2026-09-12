@@ -18,7 +18,7 @@ const CLICK_DRAG_THRESHOLD = 6; // px
 const isMobile = window.innerWidth <= 800;
 
 const state = {
-  outsideView: false,
+  outsideView: true,
   showGuides: true,
   connections: [], // [starIndexA, starIndexB]
   cameraQuat: null, // saved orientation, restored on load
@@ -118,7 +118,10 @@ function starPointSize(mag) {
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.01, SPHERE_RADIUS * 10);
-camera.position.set(0, 0, SKY_CAMERA_DIST);
+const initialGlobeDist = isMobile ? GLOBE_CAMERA_DIST_MOBILE : GLOBE_CAMERA_DIST_DESKTOP;
+camera.position.set(0, 0, initialGlobeDist);
+camera.fov = 55;
+camera.updateProjectionMatrix();
 
 const renderer = new THREE.WebGLRenderer({ canvas: els.canvas, antialias: true, alpha: false });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -129,10 +132,11 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.08;
 controls.enablePan = false;
-controls.enableZoom = false;
-controls.rotateSpeed = isMobile ? -0.35 : 0.5;
-controls.minDistance = 0;
-controls.maxDistance = 0.1;
+controls.enableZoom = true;
+controls.zoomSpeed = 0.5;
+controls.rotateSpeed = 0.5;
+controls.minDistance = SPHERE_RADIUS * 1.3;
+controls.maxDistance = SPHERE_RADIUS * 6;
 controls.target.set(0, 0, 0);
 
 if (state.cameraQuat) {
@@ -567,9 +571,12 @@ function init() {
   els.listToggleBtn.addEventListener("click", () => {
     const collapsed = els.listWrap.classList.toggle("collapsed");
     els.listToggleBtn.setAttribute("aria-expanded", String(!collapsed));
+    els.listToggleBtn.classList.toggle("active", !collapsed);
   });
 
   els.guideBtn.classList.toggle("active", state.showGuides);
+  els.globeBtn.classList.toggle("active", state.outsideView);
+  els.coords.style.display = state.outsideView ? "none" : "";
 
   els.canvas.addEventListener("pointerdown", onPointerDown);
   window.addEventListener("pointermove", onPointerMove);
