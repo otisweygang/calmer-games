@@ -199,8 +199,16 @@ body {
   outline-offset: 2px;
 }
 
-.change-settings-btn {
-  align-self: center;
+.play-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.menu-btn,
+.how-to-play-btn {
   min-height: 40px;
   padding: 6px 16px;
   font-family: "Nunito", system-ui, sans-serif;
@@ -213,15 +221,120 @@ body {
   cursor: pointer;
 }
 
-.change-settings-btn:hover,
-.change-settings-btn:focus-visible {
+.menu-btn:hover,
+.menu-btn:focus-visible,
+.how-to-play-btn:hover,
+.how-to-play-btn:focus-visible {
   color: var(--ink);
   box-shadow: 0 4px 10px rgba(58, 54, 48, 0.1);
 }
 
-.change-settings-btn:focus-visible {
+.menu-btn:focus-visible,
+.how-to-play-btn:focus-visible {
   outline: 3px solid var(--ink);
   outline-offset: 2px;
+}
+
+.how-to-play-btn[aria-expanded="true"] {
+  color: var(--ink);
+  background: var(--bg);
+}
+
+.menu-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(58, 54, 48, 0.28);
+  z-index: 20;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.menu-backdrop[hidden] {
+  display: none;
+}
+
+.menu-backdrop.menu-backdrop--visible {
+  opacity: 1;
+}
+
+.menu-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 21;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 18px;
+  width: min(320px, 86vw);
+  padding: 20px 20px 28px;
+  background: #ffffff;
+  border-right: 1px solid var(--card-border);
+  box-shadow: 8px 0 24px rgba(58, 54, 48, 0.18);
+  overflow-y: auto;
+  transform: translateX(-100%);
+  transition: transform 0.22s ease;
+}
+
+.menu-drawer[hidden] {
+  display: none;
+}
+
+.menu-drawer.menu-drawer--open {
+  transform: translateX(0);
+}
+
+.menu-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.menu-drawer-title {
+  margin: 0;
+  font-family: "Baloo 2", "Nunito", sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.menu-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  min-height: 40px;
+  font-size: 1.1rem;
+  color: var(--ink-soft);
+  background: var(--bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.menu-close-btn:hover,
+.menu-close-btn:focus-visible {
+  color: var(--ink);
+  box-shadow: 0 4px 10px rgba(58, 54, 48, 0.1);
+}
+
+.menu-close-btn:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.menu-settings-groups .settings-row {
+  align-items: flex-start;
+}
+
+.menu-settings-groups .settings-row-label {
+  text-align: left;
+}
+
+.menu-settings-groups .segmented {
+  justify-content: flex-start;
 }
 
 .how-to-play {
@@ -240,6 +353,10 @@ body {
   box-shadow: 0 4px 14px rgba(58, 54, 48, 0.08);
 }
 
+.how-to-play[hidden] {
+  display: none;
+}
+
 /* Last-resort compaction: layoutGrids() in script.js toggles this on
    #play-screen when even minimum-size grid cells aren't enough to fit
    everything on an extremely short/narrow viewport (chrome alone —
@@ -253,7 +370,8 @@ body {
   display: none;
 }
 
-.play-screen--compact .change-settings-btn {
+.play-screen--compact .menu-btn,
+.play-screen--compact .how-to-play-btn {
   min-height: 32px;
   padding: 4px 12px;
   font-size: 0.8rem;

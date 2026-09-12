@@ -44,9 +44,12 @@
     </section>
 
     <section id="play-screen" class="screen" hidden>
-      <button id="change-settings-btn" type="button" class="change-settings-btn">⚙ Change settings</button>
+      <div class="play-toolbar">
+        <button id="menu-btn" type="button" class="menu-btn" aria-haspopup="true" aria-expanded="false" aria-controls="menu-drawer">☰ Menu</button>
+        <button id="how-to-play-btn" type="button" class="how-to-play-btn" aria-haspopup="true" aria-expanded="false" aria-controls="how-to-play">? How to play</button>
+      </div>
 
-      <ol class="how-to-play">
+      <ol id="how-to-play" class="how-to-play" hidden>
         <li>Look at <strong>Match this</strong>.</li>
         <li>Pick a colour below.</li>
         <li>Tap squares in <strong>Your grid</strong> to paint them.</li>
@@ -75,6 +78,37 @@
 
       <button id="new-pattern-btn" type="button">New pattern</button>
     </section>
+
+    <div id="menu-backdrop" class="menu-backdrop" hidden></div>
+
+    <aside id="menu-drawer" class="menu-drawer" hidden aria-label="Menu">
+      <div class="menu-drawer-header">
+        <h2 class="menu-drawer-title">Menu</h2>
+        <button id="menu-close-btn" type="button" class="menu-close-btn" aria-label="Close menu">✕</button>
+      </div>
+
+      <div class="settings-groups menu-settings-groups">
+        <div class="settings-row">
+          <span class="settings-row-label" id="menu-size-label">Grid size</span>
+          <div class="segmented" role="group" aria-labelledby="menu-size-label" id="menu-size-options"></div>
+        </div>
+
+        <div class="settings-row">
+          <span class="settings-row-label" id="menu-colours-label">Number of colours</span>
+          <div class="segmented" role="group" aria-labelledby="menu-colours-label" id="menu-colour-count-options"></div>
+        </div>
+
+        <div class="settings-row">
+          <span class="settings-row-label" id="menu-mode-label">Pattern</span>
+          <div class="segmented" role="group" aria-labelledby="menu-mode-label" id="menu-mode-options"></div>
+        </div>
+
+        <div class="settings-row" id="menu-picture-row" hidden>
+          <span class="settings-row-label" id="menu-picture-label">Picture</span>
+          <div class="segmented" role="group" aria-labelledby="menu-picture-label" id="menu-picture-options"></div>
+        </div>
+      </div>
+    </aside>
   </main>
 
   <script src="script.js"></script>

@@ -54,14 +54,131 @@ const PICTURES = {
   sun: {
     label: "Sun",
     grids: {
-      3: grid(["p.p", ".p.", "p.p"]),
-      4: grid(["p..p", ".pp.", ".pp.", "p..p"]),
-      5: grid(["p.p.p", ".ppp.", "ppppp", ".ppp.", "p.p.p"]),
-      6: grid(["p....p", ".pppp.", "pppppp", "pppppp", ".pppp.", "p....p"]),
-      8: grid(["...p....", ".p....p.", "..pppp..", "..pppp..", "p.ppppp.", "..pppp..", ".p..p.p.", "........"]),
+      3: grid(["aca", "cac", "aca"]),
+      4: grid(["acca", "caac", "caac", "acca"]),
+      5: grid(["c.c.c", ".aca.", "ccacc", ".aca.", "c.c.c"]),
+      6: grid(["c.c..c", ".caac.", ".accac", "cacca.", ".caac.", "c..c.c"]),
+      8: grid(["...c..a.", "aa..c.a.", "..aaca..", ".cccca.c", "c.acccc.", "..acaa..", ".a.c..aa", ".a..c..."]),
       10: grid(["....p.....", "..........", "..p.pp.p..", "...pppp...", "p.ppppppp.", "p.pppppp..", "...pppp...", "..p.pp.p..", "....p.....", ".........."]),
       12: grid([".....pp.....", "............", "..p..pp..p..", "...pppppp...", "...pppppp...", "...pppppp...", "p.ppppppp.p.", "...pppppp...", "...pppppp...", "..p......p..", "......p.....", "............"]),
       14: grid(["......p.......", "..............", "..p...p....p..", "...p.pppp.p...", "....pppppp....", "...pppppppp...", "p.ppppppppp.p.", "p.ppppppppp...", "...pppppppp...", "....pppppp....", "...p.pppp.p...", "..p........p..", "......p.......", ".............."]),
+    },
+  },
+  moon: {
+    label: "Moon",
+    grids: {
+      3: grid([".a.", "aa.", ".a."]),
+      4: grid([".aa.", "aaa.", "aaa.", ".aa."]),
+      5: grid(["..a..", ".aaa.", "aaa..", ".aaa.", "..a.."]),
+      6: grid(["......", ".aa...", ".a....", ".a....", ".aa...", "......"]),
+      8: grid(["........", "..aa....", ".aa.....", ".aa.....", ".aa.....", ".aa.....", "..aa....", "........"]),
+      10: grid(["..........", "...aaa....", "..aaa.....", ".aaa......", ".aaa......", ".aaa......", ".aaa......", "..aaa.....", "...aaa....", ".........."]),
+      12: grid(["............", "....aaa.....", "..aaaa......", "..aaa.......", ".aaaa.......", ".aaaa.......", ".aaaa.......", ".aaaa.......", "..aaa.......", "..aaaa......", "....aaa.....", "............"]),
+      14: grid(["..............", ".....aaaa.....", "...aaaa.......", "..aaaa........", "..aaaa........", ".aaaaa........", ".aaaa.........", ".aaaa.........", ".aaaaa........", "..aaaa........", "..aaaa........", "...aaaa.......", ".....aaaa.....", ".............."]),
+    },
+  },
+  house: {
+    label: "House",
+    grids: {
+      3: grid(["ccc", "kkk", "kak"]),
+      4: grid(["cccc", "kkkk", "kkkk", "kkak"]),
+      5: grid([".ccc.", "ccccc", "kkkkk", "kkkkk", "kkakk"]),
+      6: grid(["..cc..", "cccccc", "kkkkkk", "kkkkkk", "kkakkk", "kkakkk"]),
+      8: grid(["...cc...", "..cccc..", "cccccccc", "kkkkkkkk", "kkkkkkkk", "kkkkkkkk", "kkkkakkk", "kkkkakkk"]),
+      10: grid(["....cc....", "..cccccc..", "cccccccccc", "kkkkkkkkkk", "kkkkkkkkkk", "kkkkkkkkkk", "kkkkkkkkkk", "kkkkaakkkk", "kkkkaakkkk", "kkkkaakkkk"]),
+      12: grid([".....cc.....", "...cccccc...", "..cccccccc..", "cccccccccccc", "kkkkkkkkkkkk", "kkkkkkkkkkkk", "kkkkkkkkkkkk", "kkkkkkkkkkkk", "kkkkkkkkkkkk", "kkkkkaakkkkk", "kkkkkaakkkkk", "kkkkkaakkkkk"]),
+      14: grid(["......cc......", "....cccccc....", "..cccccccccc..", "cccccccccccccc", "kkkkkkkkkkkkkk", "kkkkkkkkkkkkkk", "kkkkkkkkkkkkkk", "kkkkkkkkkkkkkk", "kkkkkkkkkkkkkk", "kkkkkkkkkkkkkk", "kkkkkkaakkkkkk", "kkkkkkaakkkkkk", "kkkkkkaakkkkkk", "kkkkkkaakkkkkk"]),
+    },
+  },
+  flower: {
+    label: "Flower",
+    grids: {
+      3: grid([".p.", "psp", ".s."]),
+      4: grid(["..p.", ".psp", "..s.", "..s."]),
+      5: grid(["..p..", "pprpp", "pprpp", "..s..", "..s.."]),
+      6: grid(["..pp..", ".pppp.", ".prrp.", "..sp..", "..sp..", "..s..."]),
+      8: grid(["...pp...", "...pp...", ".pprrpp.", ".pprrpp.", "...ps...", "...ps...", "....s...", "....s..."]),
+      10: grid(["...pppp...", "..pppppp..", "..pppppp..", ".ppprrppp.", ".ppprrppp.", "..ppsppp..", "..ppsppp..", "....sp....", "....s.....", "....s....."]),
+      12: grid(["...pppppp...", "..pppppppp..", "..pppppppp..", ".pppprrpppp.", ".ppprrrrppp.", "..ppprrppp..", "..ppppsppp..", "..ppppsppp..", ".....ps.....", "......s.....", "......s.....", "......s....."]),
+      14: grid(["....pppppp....", "...pppppppp...", "..pppppppppp..", "..pppprrpppp..", ".pppprrrrpppp.", ".pppprrrrpppp.", "..pppprrpppp..", "..ppppsppppp..", "...pppspppp...", "....ppsppp....", "......sp......", "......s.......", "......s.......", "......s......."]),
+    },
+  },
+  cat: {
+    label: "Cat",
+    grids: {
+      3: grid(["a.a", "aaa", ".a."]),
+      4: grid(["a..a", "aaaa", "aaaa", ".aa."]),
+      5: grid(["a...a", ".aaa.", "aaaaa", "aaaaa", ".aaa."]),
+      6: grid([".a..a.", ".aaaa.", "..aa..", ".appa.", ".aaaa.", "..aa.."]),
+      8: grid(["........", "..a..a..", ".aaaaaa.", "..aaaa..", ".aaaaaa.", ".apaapa.", "..aaaa..", "..aaaa.."]),
+      10: grid(["..........", "...a..a...", ".aaaaaaaa.", "...aaaa...", "..aaaaaa..", "..aaaaaa..", "..apaapa..", "..aaaaaa..", "..aaaaaa..", "...aaaa..."]),
+      12: grid(["............", "...a....a...", "...aa..aa...", "..aaaaaaaa..", "...aaaaaa...", "...aaaaaa...", "..aaaaaaaa..", "..aapaapaa..", "..aaaaaaaa..", "..aaaaaaaa..", "...aaaaaa...", ".....aa....."]),
+      14: grid(["..............", "..............", "....a....a....", "...aaa..aaa...", "..aaaaaaaaaa..", "....aaaaaa....", "...aaaaaaaa...", "..aaaaaaaaaa..", "..aaapaapaaa..", "..aaaaaaaaaa..", "...aaaaaaaa...", "...aaaaaaaa...", "....aaaaaa....", "......aa......"]),
+    },
+  },
+  dog: {
+    label: "Dog",
+    grids: {
+      3: grid(["c.c", "ccc", ".a."]),
+      4: grid(["c..c", "cccc", "cccc", ".aa."]),
+      5: grid(["c...c", ".ccc.", "ccccc", "ccccc", ".aa.."]),
+      6: grid(["......", "..cc..", "ccppcc", "ccaacc", "ccaacc", "cc..cc"]),
+      8: grid(["........", "........", "..cccc..", ".ccppcc.", ".cccccc.", ".ccaacc.", ".ccaacc.", ".cc..cc."]),
+      10: grid(["..........", "..........", "...cccc...", "..cccccc..", ".ccpccpcc.", ".cccccccc.", ".cccaaccc.", ".cccaaccc.", ".cc....cc.", ".........."]),
+      12: grid(["............", "............", "....cccc....", "...cccccc...", "..cccccccc..", ".cccpccpccc.", ".cccccccccc.", ".cccaaaaccc.", ".cccaaaaccc.", ".cc.cccc.cc.", ".cc......cc.", "............"]),
+      14: grid(["..............", "..............", "......cc......", "....cccccc....", "...cccccccc...", "...cccccccc...", "..cccpccpccc..", "..cccccccccc..", "..cccaaaaccc..", "..cccaaaaccc..", "..cccaaaaccc..", "..cc......cc..", "..cc......cc..", ".............."]),
+    },
+  },
+  butterfly: {
+    label: "Butterfly",
+    grids: {
+      3: grid(["k.k", "ksk", "r.r"]),
+      4: grid(["kksk", "kksk", "rrsr", ".rr."]),
+      5: grid(["kk.kk", "kkskk", "kkskk", "rrsrr", ".rsr."]),
+      6: grid(["..s...", ".ks.k.", "kks.kk", ".ks.k.", ".rs.r.", ".rs.r."]),
+      8: grid(["....s...", "....s...", ".kk.skk.", ".kk.skk.", ".kk.skk.", ".rr.srr.", ".rr.srr.", "....s..."]),
+      10: grid(["....s.....", "....s.....", ".kkks.kkk.", ".kkks.kkk.", ".kkks.kkk.", ".kkks.kkk.", ".rrrs.rrr.", ".rrrs.rrr.", "..rrs.rr..", "....s....."]),
+      12: grid(["......s.....", "......s.....", "..kk..s.kk..", ".kkkk.skkkk.", ".kkkk.skkkk.", ".kkkk.skkkk.", "..kkk.skkk..", "..rrr.srrr..", ".rrrr.srrrr.", "..rrr.srrr..", "...r..s.r...", "......s....."]),
+      14: grid(["......s.......", "......s.......", "...k..s...k...", ".kkkkks.kkkkk.", ".kkkkks.kkkkk.", ".kkkkks.kkkkk.", ".kkkkks.kkkkk.", "..kkk.s..kkk..", "..rrr.s..rrr..", "..rrrrs.rrrr..", "..rrrrs.rrrr..", "..rrr.s..rrr..", "......s.......", "......s......."]),
+    },
+  },
+  fish: {
+    label: "Fish",
+    grids: {
+      3: grid(["k.c", "kkc", "k.c"]),
+      4: grid([".kk.", "kkkc", "kkkc", ".kk."]),
+      5: grid(["..k..", ".kkk.", "kkkkc", ".kkk.", "..k.."]),
+      6: grid(["......", "..kk.c", ".kpkcc", ".kkkcc", "..kk.c", "......"]),
+      8: grid(["........", "........", ".kkkkk.c", ".kpkkkcc", ".kkkkkcc", ".kkkkk.c", "........", "........"]),
+      10: grid(["..........", "..........", "..kkkk...c", ".kkkkkk.cc", ".kkpkkkccc", ".kkkkkkccc", ".kkkkkk.cc", "..kkkk...c", "..........", ".........."]),
+      12: grid(["............", "............", "....kk......", "..kkkkkk..cc", ".kkpkkkkkccc", ".kkkkkkkcccc", ".kkkkkkkcccc", ".kkkkkkkkccc", "..kkkkkk..cc", "....kk......", "............", "............"]),
+      14: grid(["..............", "..............", "..............", "...kkkkkk....c", "..kkkkkkkk..cc", ".kkkpkkkkkkccc", ".kkkkkkkkkcccc", ".kkkkkkkkkcccc", ".kkkkkkkkkkccc", "..kkkkkkkk..cc", "...kkkkkk....c", "..............", "..............", ".............."]),
+    },
+  },
+  mushroom: {
+    label: "Mushroom",
+    grids: {
+      3: grid([".r.", ".a.", ".a."]),
+      4: grid([".rr.", "rrrr", ".aa.", ".aa."]),
+      5: grid(["..r..", "rrrrr", ".aaa.", ".aaa.", ".aaa."]),
+      6: grid(["..rr..", ".rrrr.", ".rrrr.", "..aa..", "..aa..", "..aa.."]),
+      8: grid(["...ra...", ".rarrar.", ".rrrrrr.", "...aa...", "...aa...", "...aa...", "...aa...", "...aa..."]),
+      10: grid(["...rrrr...", ".rraraarr.", ".rrrrrrrr.", "..........", "...aaaa...", "...aaaa...", "...aaaa...", "...aaaa...", "...aaaa...", "...aaaa..."]),
+      12: grid(["....rrrr....", "..rarrarrr..", ".rrrrrrrarr.", ".rrrrrrrrrr.", "............", "....aaaa....", "....aaaa....", "....aaaa....", "....aaaa....", "....aaaa....", "....aaaa....", "....aaaa...."]),
+      14: grid([".....rrrr.....", "..rrrrrarrrr..", "..rrarrrrarr..", ".rrrrrrrrrrrr.", ".rrrrrrrrrrrr.", "..............", ".....aaaa.....", ".....aaaa.....", ".....aaaa.....", ".....aaaa.....", ".....aaaa.....", ".....aaaa.....", ".....aaaa.....", ".....aaaa....."]),
+    },
+  },
+  umbrella: {
+    label: "Umbrella",
+    grids: {
+      3: grid([".p.", "ppp", ".c."]),
+      4: grid([".pp.", "pppp", ".c..", ".c.."]),
+      5: grid(["..p..", ".ppp.", "ppppp", "..c..", "..c.."]),
+      6: grid(["pppppp", "......", "..c...", "..c...", "..c...", "..cc.."]),
+      8: grid(["pppppppp", "pppppppp", "........", "....c...", "....c...", "....c...", "....c...", "....cc.."]),
+      10: grid(["pppppppppp", ".pppppppp.", "..........", "....c.....", "....c.....", "....c.....", "....c.....", "....c.....", "....c.....", "....cc...."]),
+      12: grid(["pppppppppppp", "pppppppppppp", ".pppppppppp.", "............", "......c.....", "......c.....", "......c.....", "......c.....", "......c.....", "......c.....", "......c.....", "......cc...."]),
+      14: grid(["pppppppppppppp", "pppppppppppppp", ".pppppppppppp.", "..pppppppppp..", "..............", "......c.......", "......c.......", "......c.......", "......c.......", "......c.......", "......c.......", "......c.......", "......c.......", "......cc......"]),
     },
   },
   moon: {
@@ -735,23 +852,27 @@ function buildSegmented(container, options, current, onSelect) {
   });
 }
 
-function renderSettingsPanel() {
+// Renders the settings controls into a given set of element ids — used
+// for both the setup screen (prefix "") and the in-play menu drawer
+// (prefix "menu-") so the two share one rendering path instead of
+// duplicating this logic.
+function renderSettingsControls(ids) {
   buildSegmented(
-    document.getElementById("size-options"),
+    document.getElementById(ids.size),
     GRID_SIZES.map((n) => ({ label: `${n}×${n}`, value: n })),
     settings.gridSize,
     (value) => updateSetting("gridSize", value)
   );
 
   buildSegmented(
-    document.getElementById("colour-count-options"),
+    document.getElementById(ids.colourCount),
     COLOUR_COUNTS.map((n) => ({ label: String(n), value: n })),
     settings.colourCount,
     (value) => updateSetting("colourCount", value)
   );
 
   buildSegmented(
-    document.getElementById("mode-options"),
+    document.getElementById(ids.mode),
     [
       { label: "Random", value: "random" },
       { label: "Picture", value: "picture" },
@@ -760,20 +881,94 @@ function renderSettingsPanel() {
     (value) => updateSetting("mode", value)
   );
 
-  const pictureRow = document.getElementById("picture-row");
+  const pictureRow = document.getElementById(ids.pictureRow);
   pictureRow.hidden = settings.mode !== "picture";
   buildSegmented(
-    document.getElementById("picture-options"),
+    document.getElementById(ids.picture),
     Object.entries(PICTURES).map(([value, p]) => ({ label: p.label, value })),
     settings.picture,
     (value) => updateSetting("picture", value)
   );
 }
 
+function renderSettingsPanel() {
+  renderSettingsControls({
+    size: "size-options",
+    colourCount: "colour-count-options",
+    mode: "mode-options",
+    pictureRow: "picture-row",
+    picture: "picture-options",
+  });
+}
+
+function renderMenuDrawer() {
+  renderSettingsControls({
+    size: "menu-size-options",
+    colourCount: "menu-colour-count-options",
+    mode: "menu-mode-options",
+    pictureRow: "menu-picture-row",
+    picture: "menu-picture-options",
+  });
+}
+
+// Settings can be changed from two places: the setup screen (before a
+// game starts — takes effect on next Play, no live grid behind it) and
+// the in-play menu drawer (settings changed while a game is already in
+// progress — takes effect immediately by regenerating the pattern, since
+// there's a real grid on screen for the player to see react).
 function updateSetting(key, value) {
   settings[key] = value;
   saveSettings();
   renderSettingsPanel();
+  renderMenuDrawer();
+  if (!document.getElementById("play-screen").hidden) {
+    startNewPattern();
+  }
+}
+
+// --- Menu drawer (in-play settings) ---
+
+function openMenuDrawer() {
+  renderMenuDrawer();
+  const drawer = document.getElementById("menu-drawer");
+  const backdrop = document.getElementById("menu-backdrop");
+  drawer.hidden = false;
+  backdrop.hidden = false;
+  // Force layout before adding the transition-triggering class, so the
+  // slide-in actually animates instead of snapping straight to open
+  // (toggling a transform-affecting class in the same tick it becomes
+  // visible can get coalesced by the browser into one paint).
+  void drawer.offsetWidth;
+  drawer.classList.add("menu-drawer--open");
+  backdrop.classList.add("menu-backdrop--visible");
+  document.getElementById("menu-btn").setAttribute("aria-expanded", "true");
+}
+
+function closeMenuDrawer() {
+  const drawer = document.getElementById("menu-drawer");
+  const backdrop = document.getElementById("menu-backdrop");
+  drawer.classList.remove("menu-drawer--open");
+  backdrop.classList.remove("menu-backdrop--visible");
+  document.getElementById("menu-btn").setAttribute("aria-expanded", "false");
+  const hide = () => {
+    drawer.hidden = true;
+    backdrop.hidden = true;
+  };
+  // Match the CSS transition duration so the drawer/backdrop stay
+  // visible (and hittable) throughout the slide-out instead of
+  // vanishing instantly.
+  window.setTimeout(hide, 220);
+}
+
+function toggleHowToPlay() {
+  const strip = document.getElementById("how-to-play");
+  const btn = document.getElementById("how-to-play-btn");
+  const open = strip.hidden;
+  strip.hidden = !open;
+  btn.setAttribute("aria-expanded", String(open));
+  // The strip's height feeds into layoutGrids()'s chrome measurement —
+  // showing/hiding it changes how much vertical space the grids get.
+  layoutGrids();
 }
 
 // --- Screen navigation ---
@@ -813,7 +1008,15 @@ function init() {
   checkMatch();
 
   document.getElementById("play-btn").addEventListener("click", startGame);
-  document.getElementById("change-settings-btn").addEventListener("click", showSetupScreen);
+  document.getElementById("menu-btn").addEventListener("click", openMenuDrawer);
+  document.getElementById("menu-close-btn").addEventListener("click", closeMenuDrawer);
+  document.getElementById("menu-backdrop").addEventListener("click", closeMenuDrawer);
+  document.getElementById("how-to-play-btn").addEventListener("click", toggleHowToPlay);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && document.getElementById("menu-drawer").classList.contains("menu-drawer--open")) {
+      closeMenuDrawer();
+    }
+  });
   document.getElementById("new-pattern-btn").addEventListener("click", startNewPattern);
   initPlayerGridDragPaint();
   window.addEventListener("resize", () => {

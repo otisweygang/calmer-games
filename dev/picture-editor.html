@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Colour Match — Picture Editor (dev only, delete after use)</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    background: #2b2926;
+    color: #eae7e0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+  }
+  h1 {
+    font-size: 1.1rem;
+    margin: 0;
+  }
+  .warning {
+    background: #55402a;
+    color: #ffd9a8;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+  }
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+  }
+  select, button, input[type=text] {
+    font: inherit;
+    font-size: 0.9rem;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid #55524a;
+    background: #3a3733;
+    color: #eae7e0;
+    cursor: pointer;
+  }
+  input[type=text] { cursor: text; min-width: 140px; }
+  button:hover { background: #47443f; }
+  button.danger { border-color: #a85c4d; color: #ffb3a0; }
+  button.primary { background: #6b8f6b; border-color: #6b8f6b; color: #10190f; font-weight: 700; }
+  button.primary:hover { background: #7ba07b; }
+
+  .main {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    justify-content: center;
+    width: 100%;
+    max-width: 1100px;
+  }
+  .panel {
+    background: #35322e;
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+  .grid {
+    display: grid;
+    gap: 3px;
+  }
+  .cell {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.08);
+    cursor: pointer;
+    position: relative;
+    padding: 0;
+  }
+  .shape-glyph {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.32);
+    mix-blend-mode: multiply;
+    pointer-events: none;
+  }
+  .palette {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    max-width: 320px;
+  }
+  .swatch {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    position: relative;
+    padding: 0;
+  }
+  .swatch.active {
+    border-color: #eae7e0;
+  }
+  .swatch-eraser {
+    background-image:
+      linear-gradient(45deg, #55524a 25%, transparent 25%, transparent 75%, #55524a 75%),
+      linear-gradient(45deg, #55524a 25%, transparent 25%, transparent 75%, #55524a 75%);
+    background-size: 12px 12px;
+    background-position: 0 0, 6px 6px;
+  }
+  textarea {
+    width: 100%;
+    max-width: 1000px;
+    height: 260px;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 0.8rem;
+    background: #1f1e1c;
+    color: #cdeccb;
+    border: 1px solid #55524a;
+    border-radius: 8px;
+    padding: 10px;
+    white-space: pre;
+  }
+  .export-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+  }
+  .hint {
+    font-size: 0.8rem;
+    color: #a89f92;
+    text-align: center;
+    max-width: 600px;
+  }
+  .picture-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    max-width: 260px;
+  }
+  .picture-list button {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+  }
+  .picture-list button.active {
+    background: #6b8f6b;
+    border-color: #6b8f6b;
+    color: #10190f;
+  }
+</style>
+</head>
+<body>
+
+<h1>Colour Match — Picture Editor</h1>
+<div class="warning">Dev tool only — not part of the game, safe to delete this whole /dev folder when done.</div>
+
+<div class="toolbar">
+  <label>Picture:
+    <select id="picture-select"></select>
+  </label>
+  <button id="new-picture-btn">+ New picture</button>
+  <input type="text" id="rename-input" placeholder="rename..." />
+  <button id="rename-btn">Rename</button>
+  <button id="delete-btn" class="danger">Delete picture</button>
+</div>
+
+<div class="toolbar">
+  <label>Grid size:
+    <select id="size-select"></select>
+  </label>
+  <button id="prev-size-btn">◀ size</button>
+  <button id="next-size-btn">size ▶</button>
+  <button id="clear-btn">Clear grid</button>
+  <button id="copy-from-btn">Copy from another size</button>
+</div>
+
+<div class="main">
+  <div class="panel">
+    <div id="grid" class="grid"></div>
+    <div class="palette" id="palette"></div>
+  </div>
+
+  <div class="panel">
+    <strong>All pictures</strong>
+    <div class="picture-list" id="picture-list"></div>
+    <div class="hint">Click a name to jump to it. Use ◀ size / size ▶ or the dropdown to move between the 8 resolutions each picture needs (3,4,5,6,8,10,12,14).</div>
+  </div>
+</div>
+
+<div class="export-row">
+  <button id="export-btn" class="primary">Generate PICTURES code to paste into script.js</button>
+  <div class="hint">This replaces the entire <code>PICTURES</code> object and <code>GRID_SIZES</code> array in games/colour-match/script.js. Copy the text below and paste it over the existing <code>const GRID_SIZES = [...]</code> through the closing <code>};</code> of PICTURES.</div>
+  <textarea id="export-output" readonly placeholder="Click the button above to generate code..."></textarea>
+</div>
+
+<script>
+// ---- Data copied from games/colour-match/script.js (kept in sync manually,
+// this tool is throwaway) ----
+const PALETTE = [
+  { name: "empty", hex: "#eae7e0", shape: null },
+  { name: "sage", hex: "#8ea88a", shape: "circle" },
+  { name: "clay", hex: "#c98f6b", shape: "triangle" },
+  { name: "sky", hex: "#7fa8bf", shape: "square" },
+  { name: "plum", hex: "#9b829e", shape: "diamond" },
+  { name: "sand", hex: "#d6b27a", shape: "cross" },
+  { name: "rose", hex: "#c48e96", shape: "star" },
+];
+
+const SHAPE_CLIP_PATHS = {
+  circle: "circle(32% at 50% 50%)",
+  square: "polygon(30% 30%, 70% 30%, 70% 70%, 30% 70%)",
+  triangle: "polygon(50% 26%, 76% 72%, 24% 72%)",
+  diamond: "polygon(50% 24%, 76% 50%, 50% 76%, 24% 50%)",
+  cross: "polygon(40% 22%, 60% 22%, 60% 40%, 78% 40%, 78% 60%, 60% 60%, 60% 78%, 40% 78%, 40% 60%, 22% 60%, 22% 40%, 40% 40%)",
+  star: "polygon(50% 20%, 61% 40%, 84% 40%, 66% 54%, 73% 76%, 50% 63%, 27% 76%, 34% 54%, 16% 40%, 39% 40%)",
+};
+
+const GRID_SIZES = [3, 4, 5, 6, 8, 10, 12, 14];
+
+const CHAR_BY_NAME = { empty: ".", sage: "s", clay: "c", sky: "k", plum: "p", sand: "a", rose: "r" };
+const NAME_BY_CHAR = Object.fromEntries(Object.entries(CHAR_BY_NAME).map(([k, v]) => [v, k]));
+
+function grid(rows) {
+  return rows.join("").split("").map((ch) => NAME_BY_CHAR[ch] ?? "empty");
+}
+
+// Starting data: the pictures currently shipped in script.js, so you can
+// tweak an existing one instead of always starting from blank.
+const PICTURES = {
+  sun: { label: "Sun", grids: {
+    3: grid(["p.p", ".p.", "p.p"]),
+    4: grid(["p..p", ".pp.", ".pp.", "p..p"]),
+    5: grid(["p.p.p", ".ppp.", "ppppp", ".ppp.", "p.p.p"]),
+    6: grid(["p....p", ".pppp.", "pppppp", "pppppp", ".pppp.", "p....p"]),
+    8: grid(["...p....", ".p....p.", "..pppp..", "..pppp..", "p.ppppp.", "..pppp..", ".p..p.p.", "........"]),
+    10: grid(["....p.....", "..........", "..p.pp.p..", "...pppp...", "p.ppppppp.", "p.pppppp..", "...pppp...", "..p.pp.p..", "....p.....", ".........."]),
+    12: grid([".....pp.....", "............", "..p..pp..p..", "...pppppp...", "...pppppp...", "...pppppp...", "p.ppppppp.p.", "...pppppp...", "...pppppp...", "..p......p..", "......p.....", "............"]),
+    14: grid(["......p.......", "..............", "..p...p....p..", "...p.pppp.p...", "....pppppp....", "...pppppppp...", "p.ppppppppp.p.", "p.ppppppppp...", "...pppppppp...", "....pppppp....", "...p.pppp.p...", "..p........p..", "......p.......", ".............."]),
+  }},
+  moon: { label: "Moon", grids: {
+    3: grid([".a.", "aa.", ".a."]),
+    4: grid([".aa.", "aaa.", "aaa.", ".aa."]),
+    5: grid(["..a..", ".aaa.", "aaa..", ".aaa.", "..a.."]),
+    6: grid(["......", ".aa...", ".a....", ".a....", ".aa...", "......"]),
+    8: grid(["........", "..aa....", ".aa.....", ".aa.....", ".aa.....", ".aa.....", "..aa....", "........"]),
+    10: grid(["..........", "...aaa....", "..aaa.....", ".aaa......", ".aaa......", ".aaa......", ".aaa......", "..aaa.....", "...aaa....", ".........."]),
+    12: grid(["............", "....aaa.....", "..aaaa......", "..aaa.......", ".aaaa.......", ".aaaa.......", ".aaaa.......", ".aaaa.......", "..aaa.......", "..aaaa......", "....aaa.....", "............"]),
+    14: grid(["..............", ".....aaaa.....", "...aaaa.......", "..aaaa........", "..aaaa........", ".aaaaa........", ".aaaa.........", ".aaaa.........", ".aaaaa........", "..aaaa........", "..aaaa........", "...aaaa.......", ".....aaaa.....", ".............."]),
+  }},
+  house: { label: "House", grids: {
+    3: grid(["ccc", "kkk", "kak"]),
+    4: grid(["cccc", "kkkk", "kkkk", "kkak"]),
+    5: grid([".ccc.", "ccccc", "kkkkk", "kkkkk", "kkakk"]),
+    6: grid(["..cc..", "cccccc", "kkkkkk", "kkkkkk", "kkakkk", "kkakkk"]),
+    8: grid(["...cc...", "..cccc..", "cccccccc", "kkkkkkkk", "kkkkkkkk", "kkkkkkkk", "kkkkakkk", "kkkkakkk"]),
+    10: grid(["....cc....", "..cccccc..", "cccccccccc", "kkkkkkkkkk", "kkkkkkkkkk", "kkkkkkkkkk", "kkkkkkkkkk", "kkkkaakkkk", "kkkkaakkkk", "kkkkaakkkk"]),
+    12: grid([".....cc.....", "...cccccc...", "..cccccccc..", "cccccccccccc", "kkkkkkkkkkkk", "kkkkkkkkkkkk", "kkkkkkkkkkkk", "kkkkkkkkkkkk", "kkkkkkkkkkkk", "kkkkkaakkkkk", "kkkkkaakkkkk", "kkkkkaakkkkk"]),
+    14: grid(["......cc......", "....cccccc....", "..cccccccccc..", "cccccccccccccc", "kkkkkkkkkkkkkk", "kkkkkkkkkkkkkk", "kkkkkkkkkkkkkk", "kkkkkkkkkkkkkk", "kkkkkkkkkkkkkk", "kkkkkkkkkkkkkk", "kkkkkkaakkkkkk", "kkkkkkaakkkkkk", "kkkkkkaakkkkkk", "kkkkkkaakkkkkk"]),
+  }},
+  flower: { label: "Flower", grids: {
+    3: grid([".p.", "psp", ".s."]),
+    4: grid(["..p.", ".psp", "..s.", "..s."]),
+    5: grid(["..p..", "pprpp", "pprpp", "..s..", "..s.."]),
+    6: grid(["..pp..", ".pppp.", ".prrp.", "..sp..", "..sp..", "..s..."]),
+    8: grid(["...pp...", "...pp...", ".pprrpp.", ".pprrpp.", "...ps...", "...ps...", "....s...", "....s..."]),
+    10: grid(["...pppp...", "..pppppp..", "..pppppp..", ".ppprrppp.", ".ppprrppp.", "..ppsppp..", "..ppsppp..", "....sp....", "....s.....", "....s....."]),
+    12: grid(["...pppppp...", "..pppppppp..", "..pppppppp..", ".pppprrpppp.", ".ppprrrrppp.", "..ppprrppp..", "..ppppsppp..", "..ppppsppp..", ".....ps.....", "......s.....", "......s.....", "......s....."]),
+    14: grid(["....pppppp....", "...pppppppp...", "..pppppppppp..", "..pppprrpppp..", ".pppprrrrpppp.", ".pppprrrrpppp.", "..pppprrpppp..", "..ppppsppppp..", "...pppspppp...", "....ppsppp....", "......sp......", "......s.......", "......s.......", "......s......."]),
+  }},
+  cat: { label: "Cat", grids: {
+    3: grid(["a.a", "aaa", ".a."]),
+    4: grid(["a..a", "aaaa", "aaaa", ".aa."]),
+    5: grid(["a...a", ".aaa.", "aaaaa", "aaaaa", ".aaa."]),
+    6: grid([".a..a.", ".aaaa.", "..aa..", ".appa.", ".aaaa.", "..aa.."]),
+    8: grid(["........", "..a..a..", ".aaaaaa.", "..aaaa..", ".aaaaaa.", ".apaapa.", "..aaaa..", "..aaaa.."]),
+    10: grid(["..........", "...a..a...", ".aaaaaaaa.", "...aaaa...", "..aaaaaa..", "..aaaaaa..", "..apaapa..", "..aaaaaa..", "..aaaaaa..", "...aaaa..."]),
+    12: grid(["............", "...a....a...", "...aa..aa...", "..aaaaaaaa..", "...aaaaaa...", "...aaaaaa...", "..aaaaaaaa..", "..aapaapaa..", "..aaaaaaaa..", "..aaaaaaaa..", "...aaaaaa...", ".....aa....."]),
+    14: grid(["..............", "..............", "....a....a....", "...aaa..aaa...", "..aaaaaaaaaa..", "....aaaaaa....", "...aaaaaaaa...", "..aaaaaaaaaa..", "..aaapaapaaa..", "..aaaaaaaaaa..", "...aaaaaaaa...", "...aaaaaaaa...", "....aaaaaa....", "......aa......"]),
+  }},
+  dog: { label: "Dog", grids: {
+    3: grid(["c.c", "ccc", ".a."]),
+    4: grid(["c..c", "cccc", "cccc", ".aa."]),
+    5: grid(["c...c", ".ccc.", "ccccc", "ccccc", ".aa.."]),
+    6: grid(["......", "..cc..", "ccppcc", "ccaacc", "ccaacc", "cc..cc"]),
+    8: grid(["........", "........", "..cccc..", ".ccppcc.", ".cccccc.", ".ccaacc.", ".ccaacc.", ".cc..cc."]),
+    10: grid(["..........", "..........", "...cccc...", "..cccccc..", ".ccpccpcc.", ".cccccccc.", ".cccaaccc.", ".cccaaccc.", ".cc....cc.", ".........."]),
+    12: grid(["............", "............", "....cccc....", "...cccccc...", "..cccccccc..", ".cccpccpccc.", ".cccccccccc.", ".cccaaaaccc.", ".cccaaaaccc.", ".cc.cccc.cc.", ".cc......cc.", "............"]),
+    14: grid(["..............", "..............", "......cc......", "....cccccc....", "...cccccccc...", "...cccccccc...", "..cccpccpccc..", "..cccccccccc..", "..cccaaaaccc..", "..cccaaaaccc..", "..cccaaaaccc..", "..cc......cc..", "..cc......cc..", ".............."]),
+  }},
+  butterfly: { label: "Butterfly", grids: {
+    3: grid(["k.k", "ksk", "r.r"]),
+    4: grid(["kksk", "kksk", "rrsr", ".rr."]),
+    5: grid(["kk.kk", "kkskk", "kkskk", "rrsrr", ".rsr."]),
+    6: grid(["..s...", ".ks.k.", "kks.kk", ".ks.k.", ".rs.r.", ".rs.r."]),
+    8: grid(["....s...", "....s...", ".kk.skk.", ".kk.skk.", ".kk.skk.", ".rr.srr.", ".rr.srr.", "....s..."]),
+    10: grid(["....s.....", "....s.....", ".kkks.kkk.", ".kkks.kkk.", ".kkks.kkk.", ".kkks.kkk.", ".rrrs.rrr.", ".rrrs.rrr.", "..rrs.rr..", "....s....."]),
+    12: grid(["......s.....", "......s.....", "..kk..s.kk..", ".kkkk.skkkk.", ".kkkk.skkkk.", ".kkkk.skkkk.", "..kkk.skkk..", "..rrr.srrr..", ".rrrr.srrrr.", "..rrr.srrr..", "...r..s.r...", "......s....."]),
+    14: grid(["......s.......", "......s.......", "...k..s...k...", ".kkkkks.kkkkk.", ".kkkkks.kkkkk.", ".kkkkks.kkkkk.", ".kkkkks.kkkkk.", "..kkk.s..kkk..", "..rrr.s..rrr..", "..rrrrs.rrrr..", "..rrrrs.rrrr..", "..rrr.s..rrr..", "......s.......", "......s......."]),
+  }},
+  fish: { label: "Fish", grids: {
+    3: grid(["k.c", "kkc", "k.c"]),
+    4: grid([".kk.", "kkkc", "kkkc", ".kk."]),
+    5: grid(["..k..", ".kkk.", "kkkkc", ".kkk.", "..k.."]),
+    6: grid(["......", "..kk.c", ".kpkcc", ".kkkcc", "..kk.c", "......"]),
+    8: grid(["........", "........", ".kkkkk.c", ".kpkkkcc", ".kkkkkcc", ".kkkkk.c", "........", "........"]),
+    10: grid(["..........", "..........", "..kkkk...c", ".kkkkkk.cc", ".kkpkkkccc", ".kkkkkkccc", ".kkkkkk.cc", "..kkkk...c", "..........", ".........."]),
+    12: grid(["............", "............", "....kk......", "..kkkkkk..cc", ".kkpkkkkkccc", ".kkkkkkkcccc", ".kkkkkkkcccc", ".kkkkkkkkccc", "..kkkkkk..cc", "....kk......", "............", "............"]),
+    14: grid(["..............", "..............", "..............", "...kkkkkk....c", "..kkkkkkkk..cc", ".kkkpkkkkkkccc", ".kkkkkkkkkcccc", ".kkkkkkkkkcccc", ".kkkkkkkkkkccc", "..kkkkkkkk..cc", "...kkkkkk....c", "..............", "..............", ".............."]),
+  }},
+  mushroom: { label: "Mushroom", grids: {
+    3: grid([".r.", ".a.", ".a."]),
+    4: grid([".rr.", "rrrr", ".aa.", ".aa."]),
+    5: grid(["..r..", "rrrrr", ".aaa.", ".aaa.", ".aaa."]),
+    6: grid(["..rr..", ".rrrr.", ".rrrr.", "..aa..", "..aa..", "..aa.."]),
+    8: grid(["...ra...", ".rarrar.", ".rrrrrr.", "...aa...", "...aa...", "...aa...", "...aa...", "...aa..."]),
+    10: grid(["...rrrr...", ".rraraarr.", ".rrrrrrrr.", "..........", "...aaaa...", "...aaaa...", "...aaaa...", "...aaaa...", "...aaaa...", "...aaaa..."]),
+    12: grid(["....rrrr....", "..rarrarrr..", ".rrrrrrrarr.", ".rrrrrrrrrr.", "............", "....aaaa....", "....aaaa....", "....aaaa....", "....aaaa....", "....aaaa....", "....aaaa....", "....aaaa...."]),
+    14: grid([".....rrrr.....", "..rrrrrarrrr..", "..rrarrrrarr..", ".rrrrrrrrrrrr.", ".rrrrrrrrrrrr.", "..............", ".....aaaa.....", ".....aaaa.....", ".....aaaa.....", ".....aaaa.....", ".....aaaa.....", ".....aaaa.....", ".....aaaa.....", ".....aaaa....."]),
+  }},
+  umbrella: { label: "Umbrella", grids: {
+    3: grid([".p.", "ppp", ".c."]),
+    4: grid([".pp.", "pppp", ".c..", ".c.."]),
+    5: grid(["..p..", ".ppp.", "ppppp", "..c..", "..c.."]),
+    6: grid(["pppppp", "......", "..c...", "..c...", "..c...", "..cc.."]),
+    8: grid(["pppppppp", "pppppppp", "........", "....c...", "....c...", "....c...", "....c...", "....cc.."]),
+    10: grid(["pppppppppp", ".pppppppp.", "..........", "....c.....", "....c.....", "....c.....", "....c.....", "....c.....", "....c.....", "....cc...."]),
+    12: grid(["pppppppppppp", "pppppppppppp", ".pppppppppp.", "............", "......c.....", "......c.....", "......c.....", "......c.....", "......c.....", "......c.....", "......c.....", "......cc...."]),
+    14: grid(["pppppppppppppp", "pppppppppppppp", ".pppppppppppp.", "..pppppppppp..", "..............", "......c.......", "......c.......", "......c.......", "......c.......", "......c.......", "......c.......", "......c.......", "......c.......", "......cc......"]),
+  }},
+};
+
+// ---- Editor state ----
+let currentPictureKey = Object.keys(PICTURES)[0];
+let currentSize = 3;
+let activeColour = "sage";
+
+function colourByName(name) {
+  return PALETTE.find((c) => c.name === name);
+}
+
+function appendShapeGlyph(parent, colour) {
+  if (!colour.shape) return;
+  const glyph = document.createElement("span");
+  glyph.className = "shape-glyph";
+  glyph.style.clipPath = SHAPE_CLIP_PATHS[colour.shape];
+  parent.appendChild(glyph);
+}
+
+function currentGrid() {
+  const pic = PICTURES[currentPictureKey];
+  if (!pic.grids[currentSize]) {
+    pic.grids[currentSize] = Array(currentSize * currentSize).fill("empty");
+  }
+  return pic.grids[currentSize];
+}
+
+function renderPicturePicker() {
+  const select = document.getElementById("picture-select");
+  select.innerHTML = "";
+  Object.entries(PICTURES).forEach(([key, pic]) => {
+    const opt = document.createElement("option");
+    opt.value = key;
+    opt.textContent = pic.label;
+    if (key === currentPictureKey) opt.selected = true;
+    select.appendChild(opt);
+  });
+
+  const list = document.getElementById("picture-list");
+  list.innerHTML = "";
+  Object.entries(PICTURES).forEach(([key, pic]) => {
+    const btn = document.createElement("button");
+    btn.textContent = pic.label;
+    if (key === currentPictureKey) btn.classList.add("active");
+    btn.addEventListener("click", () => {
+      currentPictureKey = key;
+      renderAll();
+    });
+    list.appendChild(btn);
+  });
+}
+
+function renderSizePicker() {
+  const select = document.getElementById("size-select");
+  select.innerHTML = "";
+  GRID_SIZES.forEach((n) => {
+    const opt = document.createElement("option");
+    opt.value = n;
+    opt.textContent = `${n}×${n}`;
+    if (n === currentSize) opt.selected = true;
+    select.appendChild(opt);
+  });
+}
+
+function renderPalette() {
+  const container = document.getElementById("palette");
+  container.innerHTML = "";
+  PALETTE.forEach((colour) => {
+    const swatch = document.createElement("button");
+    swatch.className = "swatch";
+    if (colour.name === "empty") swatch.classList.add("swatch-eraser");
+    if (colour.name === activeColour) swatch.classList.add("active");
+    swatch.style.backgroundColor = colour.hex;
+    swatch.title = colour.name;
+    swatch.addEventListener("click", () => {
+      activeColour = colour.name;
+      renderPalette();
+    });
+    appendShapeGlyph(swatch, colour);
+    container.appendChild(swatch);
+  });
+}
+
+let isPainting = false;
+let lastPaintedIndex = null;
+
+function styleCell(cell, name) {
+  const colour = colourByName(name);
+  cell.style.backgroundColor = colour.hex;
+  const oldGlyph = cell.querySelector(".shape-glyph");
+  if (oldGlyph) oldGlyph.remove();
+  appendShapeGlyph(cell, colour);
+}
+
+function renderGrid() {
+  const container = document.getElementById("grid");
+  const values = currentGrid();
+  container.style.gridTemplateColumns = `repeat(${currentSize}, 36px)`;
+  container.style.gridTemplateRows = `repeat(${currentSize}, 36px)`;
+  container.innerHTML = "";
+  values.forEach((name, i) => {
+    const cell = document.createElement("button");
+    cell.className = "cell";
+    styleCell(cell, name);
+    cell.addEventListener("pointerdown", () => {
+      isPainting = true;
+      lastPaintedIndex = null;
+      paint(i, cell);
+    });
+    cell.addEventListener("pointerenter", () => {
+      if (isPainting) paint(i, cell);
+    });
+    container.appendChild(cell);
+  });
+}
+
+document.addEventListener("pointerup", () => {
+  isPainting = false;
+  lastPaintedIndex = null;
+});
+
+// Updates only the one affected cell's own style in place rather than
+// re-rendering the whole grid (renderGrid() rebuilds every cell node) —
+// destroying/recreating the node under a stationary pointer during a
+// click fires a fresh pointerenter on the new node while isPainting is
+// still true, which re-triggers paint() and cascades into painting
+// unrelated cells from a single click. lastPaintedIndex also dedupes
+// repeated paints of the same cell while the pointer lingers over it.
+function paint(index, cell) {
+  if (index === lastPaintedIndex) return;
+  lastPaintedIndex = index;
+  currentGrid()[index] = activeColour;
+  styleCell(cell, activeColour);
+}
+
+function renderAll() {
+  renderPicturePicker();
+  renderSizePicker();
+  renderPalette();
+  renderGrid();
+}
+
+// ---- Toolbar actions ----
+document.getElementById("picture-select").addEventListener("change", (e) => {
+  currentPictureKey = e.target.value;
+  renderAll();
+});
+
+document.getElementById("size-select").addEventListener("change", (e) => {
+  currentSize = Number(e.target.value);
+  renderAll();
+});
+
+document.getElementById("prev-size-btn").addEventListener("click", () => {
+  const i = GRID_SIZES.indexOf(currentSize);
+  currentSize = GRID_SIZES[(i - 1 + GRID_SIZES.length) % GRID_SIZES.length];
+  renderAll();
+});
+
+document.getElementById("next-size-btn").addEventListener("click", () => {
+  const i = GRID_SIZES.indexOf(currentSize);
+  currentSize = GRID_SIZES[(i + 1) % GRID_SIZES.length];
+  renderAll();
+});
+
+document.getElementById("clear-btn").addEventListener("click", () => {
+  PICTURES[currentPictureKey].grids[currentSize] = Array(currentSize * currentSize).fill("empty");
+  renderGrid();
+});
+
+document.getElementById("copy-from-btn").addEventListener("click", () => {
+  const sizes = GRID_SIZES.filter((s) => PICTURES[currentPictureKey].grids[s]);
+  const from = prompt(`Copy which size's pixels into ${currentSize}×${currentSize}? (Only copies overlapping cells; other sizes: ${sizes.join(", ")})`, sizes[0]);
+  const fromSize = Number(from);
+  if (!fromSize || !PICTURES[currentPictureKey].grids[fromSize]) return;
+  const src = PICTURES[currentPictureKey].grids[fromSize];
+  const dst = Array(currentSize * currentSize).fill("empty");
+  const n = Math.min(fromSize, currentSize);
+  for (let r = 0; r < n; r++) {
+    for (let c = 0; c < n; c++) {
+      dst[r * currentSize + c] = src[r * fromSize + c];
+    }
+  }
+  PICTURES[currentPictureKey].grids[currentSize] = dst;
+  renderGrid();
+});
+
+document.getElementById("new-picture-btn").addEventListener("click", () => {
+  const name = prompt("New picture name (label shown to players):", "New picture");
+  if (!name) return;
+  const key = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "picture";
+  let uniqueKey = key;
+  let n = 2;
+  while (PICTURES[uniqueKey]) { uniqueKey = `${key}-${n++}`; }
+  PICTURES[uniqueKey] = { label: name, grids: {} };
+  GRID_SIZES.forEach((s) => { PICTURES[uniqueKey].grids[s] = Array(s * s).fill("empty"); });
+  currentPictureKey = uniqueKey;
+  currentSize = 3;
+  renderAll();
+});
+
+document.getElementById("rename-btn").addEventListener("click", () => {
+  const input = document.getElementById("rename-input");
+  const name = input.value.trim();
+  if (!name) return;
+  PICTURES[currentPictureKey].label = name;
+  input.value = "";
+  renderAll();
+});
+
+document.getElementById("delete-btn").addEventListener("click", () => {
+  const keys = Object.keys(PICTURES);
+  if (keys.length <= 1) { alert("Can't delete the last picture."); return; }
+  if (!confirm(`Delete "${PICTURES[currentPictureKey].label}"? This can't be undone.`)) return;
+  delete PICTURES[currentPictureKey];
+  currentPictureKey = Object.keys(PICTURES)[0];
+  currentSize = 3;
+  renderAll();
+});
+
+// ---- Export ----
+function gridToRows(values, size) {
+  const rows = [];
+  for (let r = 0; r < size; r++) {
+    let row = "";
+    for (let c = 0; c < size; c++) {
+      row += CHAR_BY_NAME[values[r * size + c]] ?? ".";
+    }
+    rows.push(row);
+  }
+  return rows;
+}
+
+document.getElementById("export-btn").addEventListener("click", () => {
+  const lines = [];
+  lines.push(`const GRID_SIZES = [${GRID_SIZES.join(", ")}];`);
+  lines.push("");
+  lines.push("const PICTURES = {");
+  Object.entries(PICTURES).forEach(([key, pic]) => {
+    lines.push(`  ${/^[a-zA-Z_$][\w$]*$/.test(key) ? key : JSON.stringify(key)}: {`);
+    lines.push(`    label: ${JSON.stringify(pic.label)},`);
+    lines.push("    grids: {");
+    GRID_SIZES.forEach((size) => {
+      const values = pic.grids[size] || Array(size * size).fill("empty");
+      const rows = gridToRows(values, size);
+      const rowsLiteral = rows.map((r) => JSON.stringify(r)).join(", ");
+      lines.push(`      ${size}: grid([${rowsLiteral}]),`);
+    });
+    lines.push("    },");
+    lines.push("  },");
+  });
+  lines.push("};");
+  document.getElementById("export-output").value = lines.join("\n");
+});
+
+renderAll();
+</script>
+</body>
+</html>

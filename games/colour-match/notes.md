@@ -9,14 +9,35 @@ setup from play gives a clear sequence: configure -> Play -> game.
 
 Setup screen: title, intro line, Settings controls, and a single
 prominent "Play" button. This is what loads first (unless resuming,
-see below). Play screen: a small "⚙ Change settings" link back to
-setup (top), a numbered how-to-play strip ("1 Look at Match this. 2
-Pick a colour below. 3 Tap squares in Your grid."), then the two grids
-side by side ("Match this" / "Your grid"), palette, status text, and
-"New pattern". The two grids NEVER stack — `.game-row` is
-`flex-wrap: nowrap` always, at every viewport width (changed from an
-earlier wrapping version — see "Fit-to-viewport" section below for
-why).
+see below). Play screen: a toolbar (top) with a "☰ Menu" button that
+opens a left-aligned slide-in drawer (`#menu-drawer` + `#menu-backdrop`)
+containing the same settings controls as the setup screen (grid size,
+colour count, pattern, picture), and a "? How to play" button that
+toggles the numbered how-to-play strip ("1 Look at Match this. 2 Pick a
+colour below. 3 Tap squares in Your grid.") — collapsed/hidden by
+default so it doesn't take up permanent space once a player already
+knows the flow, shown via `toggleHowToPlay()`. Then the two grids side
+by side ("Match this" / "Your grid"), palette, status text, and "New
+pattern". The two grids NEVER stack — `.game-row` is `flex-wrap:
+nowrap` always, at every viewport width (changed from an earlier
+wrapping version — see "Fit-to-viewport" section below for why).
+
+Toggling the how-to-play strip calls `layoutGrids()` since the strip's
+height feeds into that function's chrome measurement — same reasoning
+as every other piece of play-screen chrome. `.play-screen--compact`
+(the extreme-viewport fallback, see "Guaranteed-fit layout" below) now
+force-hides the strip regardless of its own toggle state, same as
+before.
+
+Unlike the setup screen (settings take effect on next Play), changing
+a setting in the in-play menu drawer takes effect immediately —
+`updateSetting()` calls `startNewPattern()` right away whenever
+`#play-screen` is visible, since there's a real grid on screen for the
+player to see react. The drawer and setup screen render into separate
+DOM ids (`menu-*` prefix vs unprefixed) but share one rendering
+function, `renderSettingsControls(ids)`, parameterised by which set of
+element ids to fill — added specifically to avoid duplicating the
+segmented-control building logic across the two surfaces.
 
 Gotcha hit while building this: `.screen`/`.settings-row` both set
 `display: flex`, which — being an author-stylesheet rule — beats the
@@ -153,7 +174,7 @@ guaranteed to fit with no scrollbar and no overlap.
 
 - **Measuring the budget**: `heightBudget` = `.game-area`'s content
   height minus the actual rendered height of every OTHER direct child
-  of `#play-screen` (how-to-play strip, change-settings button,
+  of `#play-screen` (how-to-play strip, menu button,
   palette, status text, new-pattern button) plus the gaps between them
   — all read live via `getBoundingClientRect()`/`getComputedStyle()`,
   not hand-tallied constants, so it stays correct if any of that chrome
@@ -208,7 +229,7 @@ guaranteed to fit with no scrollbar and no overlap.
   shrinking grid cells can't fix that, since the grids aren't the
   problem. In that case `layoutGrids()` adds `.play-screen--compact` to
   `#play-screen` (hides the how-to-play strip, shrinks the
-  change-settings/new-pattern buttons and status text — see the
+  menu/new-pattern buttons and status text — see the
   `.play-screen--compact` rules in style.css) and redoes the entire
   layout computation once more (guarded by an `isRetry` parameter so
   this can only escalate one level, never loop). Compact mode is
