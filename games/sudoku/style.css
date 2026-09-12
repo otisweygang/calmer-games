@@ -1,0 +1,382 @@
+/* Standalone: do not import from /shared/. Copy/paste values instead. */
+
+@import url("https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Nunito:wght@400;600;700&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #fdf6ec;
+  --ink: #3a3630;
+  --ink-soft: #6b6459;
+  --card-border: rgba(58, 54, 48, 0.08);
+  --given-bg: #f1ece0;
+  --selected-bg: #e4efec;
+  --conflict-outline: #6b6459;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: "Nunito", system-ui, sans-serif;
+  background: var(--bg);
+  background-image:
+    radial-gradient(circle at 10% 15%, rgba(255, 210, 170, 0.35), transparent 40%),
+    radial-gradient(circle at 90% 10%, rgba(170, 210, 255, 0.3), transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(190, 230, 190, 0.3), transparent 45%);
+  color: var(--ink);
+}
+
+.game-header {
+  display: flex;
+  align-items: center;
+  flex: none;
+  padding: 10px 16px;
+}
+
+#ls-exit {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 8px 16px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.08);
+  cursor: pointer;
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.screen[hidden] {
+  display: none;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.08);
+}
+
+.settings-panel {
+  align-items: stretch;
+  gap: 18px;
+  width: 100%;
+  padding: 28px 24px 32px;
+}
+
+.setup-title {
+  margin: 0;
+  font-family: "Baloo 2", "Nunito", sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--ink);
+}
+
+.setup-intro {
+  margin: -8px 0 0;
+  font-size: 0.95rem;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
+.play-btn {
+  min-height: 52px;
+  margin-top: 6px;
+  font-family: "Baloo 2", "Nunito", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--ink);
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.2);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.play-btn:hover,
+.play-btn:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(58, 54, 48, 0.25);
+}
+
+.play-btn:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.change-settings-btn {
+  align-self: center;
+  min-height: 40px;
+  padding: 6px 16px;
+  font-family: "Nunito", system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.change-settings-btn:hover,
+.change-settings-btn:focus-visible {
+  color: var(--ink);
+  box-shadow: 0 4px 10px rgba(58, 54, 48, 0.1);
+}
+
+.change-settings-btn:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.settings-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.settings-row-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.segmented {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.segment {
+  min-height: 40px;
+  padding: 6px 14px;
+  font-family: "Nunito", system-ui, sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.segment:hover,
+.segment:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(58, 54, 48, 0.1);
+}
+
+.segment:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.segment-active {
+  background: var(--ink);
+  color: #ffffff;
+  border-color: var(--ink);
+}
+
+.game-area {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  padding: 8px 16px 24px;
+}
+
+.board-panel {
+  padding: 10px;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(28px, 44px));
+  grid-template-rows: repeat(9, minmax(28px, 44px));
+  gap: 1px;
+  background: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  font-family: "Nunito", system-ui, sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: #ffffff;
+  border: none;
+  cursor: pointer;
+}
+
+/* Thicker box-separator borders every 3rd row/column, drawn with box-shadow
+   so they don't disturb the 1px grid gap used for the thin lines. */
+.cell[data-col="2"],
+.cell[data-col="5"] {
+  box-shadow: inset -2px 0 0 var(--ink);
+}
+
+.cell[data-row="2"],
+.cell[data-row="5"] {
+  box-shadow: inset 0 -2px 0 var(--ink);
+}
+
+.cell[data-col="2"][data-row="2"],
+.cell[data-col="2"][data-row="5"],
+.cell[data-col="5"][data-row="2"],
+.cell[data-col="5"][data-row="5"] {
+  box-shadow: inset -2px -2px 0 var(--ink);
+}
+
+.cell-given {
+  font-weight: 700;
+  background: var(--given-bg);
+  cursor: default;
+}
+
+.cell-selected {
+  background: var(--selected-bg);
+}
+
+.cell:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: -3px;
+  z-index: 1;
+}
+
+/* Conflict cue: a small corner marker, not a colour change, per the
+   project's "never rely on colour alone" rule (see notes.md). */
+.cell-conflict::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1.5px solid var(--conflict-outline);
+}
+
+.number-pad {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  max-width: 420px;
+}
+
+.pad-btn {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 6px 10px;
+  font-family: "Baloo 2", "Nunito", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pad-btn:hover,
+.pad-btn:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(58, 54, 48, 0.12);
+}
+
+.pad-btn:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.pad-btn-eraser {
+  font-family: "Nunito", system-ui, sans-serif;
+  font-size: 0.85rem;
+}
+
+#status {
+  min-height: 1.5em;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--ink);
+}
+
+#new-puzzle-btn {
+  min-height: 44px;
+  padding: 10px 22px;
+  font-family: "Baloo 2", "Nunito", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+#new-puzzle-btn:hover,
+#new-puzzle-btn:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(58, 54, 48, 0.12);
+}
+
+#new-puzzle-btn:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

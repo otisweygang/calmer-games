@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sudoku</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="game-header">
+    <a id="ls-exit" href="../../index.html" aria-label="Back to home">← Home</a>
+  </header>
+
+  <main class="game-area" id="game-area">
+    <section id="setup-screen" class="screen">
+      <div class="panel settings-panel" aria-label="Settings">
+        <h1 class="setup-title">Sudoku</h1>
+        <p class="setup-intro">Pick a difficulty, then start.</p>
+
+        <div class="settings-row">
+          <span class="settings-row-label" id="difficulty-label">Difficulty</span>
+          <div class="segmented" role="group" aria-labelledby="difficulty-label" id="difficulty-options"></div>
+        </div>
+
+        <button id="play-btn" type="button" class="play-btn">Play</button>
+      </div>
+    </section>
+
+    <section id="play-screen" class="screen" hidden>
+      <button id="change-settings-btn" type="button" class="change-settings-btn">⚙ Change settings</button>
+
+      <div class="panel board-panel" aria-label="Sudoku board">
+        <div id="board" class="board"></div>
+      </div>
+
+      <div aria-label="Number pad">
+        <div id="number-pad" class="number-pad"></div>
+      </div>
+
+      <p id="status" role="status" aria-live="polite"></p>
+
+      <button id="new-puzzle-btn" type="button">New puzzle</button>
+    </section>
+  </main>
+
+  <script src="vendor/sudoku.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "title": "Sudoku",
+  "description": "Fill the grid. No timer, no score.",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png"
+}
