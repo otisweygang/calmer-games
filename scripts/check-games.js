@@ -59,17 +59,12 @@ function checkGame(name) {
   // Isolation: no <script src>, <link href>, import, or fetch may reach
   // outside the game's own folder. The required exit link (the element
   // with id="ls-exit") is exempt — it must point back to the portal.
-  // shared/lock.js + shared/lock.css are also exempt: the one deliberate
-  // exception to game isolation, documented in README.md under "Kiosk
-  // lock" — portal-owned safety enforcement, included unmodified by
-  // every game.
   const FORBIDDEN_REF = /(?:src|href|import\s+.*?from|fetch)\s*=?\(?\s*["'](\.\.\/[^"']*|\/shared\/[^"']*)["']/g;
 
   for (const file of walkFiles(gameDir)) {
     const lines = fs.readFileSync(file, "utf8").split("\n");
     lines.forEach((line, i) => {
       if (/id=["']ls-exit["']/.test(line)) return; // sanctioned exception
-      if (/shared\/lock\.(js|css)["']/.test(line)) return; // sanctioned exception
       let match;
       FORBIDDEN_REF.lastIndex = 0;
       while ((match = FORBIDDEN_REF.exec(line)) !== null) {

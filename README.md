@@ -17,45 +17,6 @@ to calm, non-exploitative games. This exists to fix that.
 Every game must be exitable back to the homepage at any time, with no
 penalty and no confirmation trap.
 
-## Kiosk lock
-
-A carer can lock a device to this site from the portal (lock icon, top
-right of the homepage): set a 3-digit passcode, and the site goes
-fullscreen. Exiting fullscreen by any means *other than clicking a link
-inside the site* (Esc, switching tabs/apps, reopening the tab, a
-bookmark) immediately shows a full passcode gate. This only guards
-*leaving the site* — navigating freely between games and the home
-screen while locked is never blocked, per the no-penalty rule above:
-
-- Clicking "← Home" or a game card is a real exit from fullscreen too
-  (browsers force that on any navigation), but it's expected free
-  navigation, not a lock violation — no gate appears. Browsers also
-  won't let a page force itself back into fullscreen without a fresh
-  tap, so the destination page just shows a small "🔒 Locked" badge
-  instead (skipped on the portal, which already shows its own lock
-  icon) and quietly re-enters fullscreen the next time the child taps
-  anything on the page.
-- Any exit that *isn't* a same-site link click — Esc, switching
-  apps/tabs, reopening the tab, a bookmark — shows the full passcode
-  gate immediately.
-
-Implementation notes:
-
-- Lock state lives in `localStorage` (`ls_lock_enabled`, `ls_lock_code`)
-  and is shared across the portal and every game page on the same
-  origin/device. The "was this exit a same-site link click" signal is a
-  short-lived flag in `sessionStorage` (`ls_lock_nav_grace`), armed
-  right before navigating and consumed on the next page load.
-- **Forgotten passcode:** a fixed master override code always unlocks
-  regardless of the passcode set: `758243`, entered via "Forgot the
-  passcode?" on the gate. Staff-only — don't share with children.
-  Change it in `shared/lock.js` (`MASTER_CODE`) if it's ever
-  compromised.
-- `shared/lock.js` + `shared/lock.css` are the one deliberate exception
-  to "games never import `/shared/`" (see Architecture decisions below):
-  it's portal-owned safety enforcement, not game logic, and every game
-  includes it unmodified via a single `<script>` tag.
-
 ## Architecture decisions
 
 - **Fully static site.** No backend, no server, no build step to deploy.
@@ -68,11 +29,9 @@ Implementation notes:
 - **Every game is fully standalone.** A game folder is self-contained
   (its own HTML/CSS/JS) and imports nothing from other games or from
   `/shared/`. Copy-paste small snippets rather than share code across
-  games — isolation over reuse. The one exception is `shared/lock.js`
-  (see Kiosk lock above): portal-owned enforcement, included unmodified
-  by every game, not game logic.
-- **`/shared/` is portal-only** (homepage shell, game menu/registry,
-  kiosk lock). It is never imported by games except for `lock.js`.
+  games — isolation over reuse.
+- **`/shared/` is portal-only** (homepage shell, game menu/registry). It
+  is never imported by games.
 - **Navigation is full-page**, not iframe or SPA injection. Clicking a game
   loads its own page directly. No iframe performance tax, no shared JS
   runtime between portal and games.
@@ -111,7 +70,8 @@ Each game folder must pass automated checks before merge:
    file, thumbnail).
 2. Entry HTML contains a required exit element (`id="ls-exit"`).
 3. No file in the game folder references a path outside that folder
-   (no imports from `/shared/` or other games).
+   (no imports from `/shared/` or other games), except the required
+   exit link.
 
 Runtime behavior (exit button actually works, no console errors, game
 usable on a throttled CPU) is manually checked before a game is added,
