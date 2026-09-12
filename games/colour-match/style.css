@@ -1,0 +1,538 @@
+/* Standalone: do not import from /shared/. Copy/paste values instead. */
+
+@import url("https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Nunito:wght@400;600;700&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #fdf6ec;
+  --ink: #3a3630;
+  --ink-soft: #6b6459;
+  --card-border: rgba(58, 54, 48, 0.08);
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: "Nunito", system-ui, sans-serif;
+  background: var(--bg);
+  background-image:
+    radial-gradient(circle at 10% 15%, rgba(255, 210, 170, 0.35), transparent 40%),
+    radial-gradient(circle at 90% 10%, rgba(170, 210, 255, 0.3), transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(190, 230, 190, 0.3), transparent 45%);
+  color: var(--ink);
+  overflow: hidden;
+}
+
+.game-header {
+  display: flex;
+  align-items: center;
+  flex: none;
+  padding: 10px 16px;
+}
+
+#ls-exit {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 8px 16px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.08);
+  cursor: pointer;
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.screen[hidden] {
+  display: none;
+}
+
+.game-row-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  min-height: 0;
+}
+
+/* Side-by-side vs stacked is decided by JS (layoutGrids() in
+   script.js), which measures real available space and picks whichever
+   orientation lets both grids fit at a workable cell size — see notes.md
+   ("Guaranteed-fit layout"). JS toggles `.game-row--stacked`; the two
+   orientations differ only in flex-direction, so cell sizing (also
+   JS-driven, in px, not clamp/vw) is what actually guarantees the fit
+   in each case. No overflow-x/scrolling here any more — the whole
+   point of measuring first is that nothing should ever need to scroll. */
+.game-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 12px;
+  min-height: 0;
+}
+
+.game-row--stacked {
+  flex-direction: column;
+  align-items: center;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 18px 16px;
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.08);
+}
+
+.settings-panel {
+  align-items: stretch;
+  gap: 18px;
+  width: 100%;
+  max-width: 360px;
+  padding: 28px 24px 32px;
+}
+
+.settings-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+}
+
+@media (min-width: 720px) {
+  .settings-panel {
+    max-width: 800px;
+    padding: 36px 40px 40px;
+  }
+
+  .settings-panel .settings-groups {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 24px 32px;
+  }
+
+  .settings-panel .settings-row {
+    width: auto;
+    flex: 1 1 0;
+  }
+
+  .settings-panel .settings-row#picture-row {
+    flex-basis: 100%;
+  }
+
+  .settings-panel .play-btn {
+    align-self: center;
+    width: 320px;
+  }
+}
+
+.setup-title {
+  margin: 0;
+  font-family: "Baloo 2", "Nunito", sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--ink);
+}
+
+.setup-intro {
+  margin: -8px 0 0;
+  font-size: 0.95rem;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
+.play-btn {
+  min-height: 52px;
+  margin-top: 6px;
+  font-family: "Baloo 2", "Nunito", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--ink);
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.2);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.play-btn:hover,
+.play-btn:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(58, 54, 48, 0.25);
+}
+
+.play-btn:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.change-settings-btn {
+  align-self: center;
+  min-height: 40px;
+  padding: 6px 16px;
+  font-family: "Nunito", system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.change-settings-btn:hover,
+.change-settings-btn:focus-visible {
+  color: var(--ink);
+  box-shadow: 0 4px 10px rgba(58, 54, 48, 0.1);
+}
+
+.change-settings-btn:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.how-to-play {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 24px;
+  max-width: 700px;
+  margin: 0;
+  padding: 10px 24px;
+  list-style: none;
+  counter-reset: step;
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.08);
+}
+
+/* Last-resort compaction: layoutGrids() in script.js toggles this on
+   #play-screen when even minimum-size grid cells aren't enough to fit
+   everything on an extremely short/narrow viewport (chrome alone —
+   how-to-play strip, buttons, palette, status — can exceed the space
+   left after the header on something like a 600x400 landscape phone).
+   Hiding the how-to-play strip is the single biggest reclaim (it's
+   instructional, not needed once a player already knows the flow);
+   shrinking the two buttons and status text recovers a bit more.
+   Normal-size screens never see this class. */
+.play-screen--compact .how-to-play {
+  display: none;
+}
+
+.play-screen--compact .change-settings-btn {
+  min-height: 32px;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+}
+
+.play-screen--compact #status {
+  min-height: 1.1em;
+  font-size: 0.95rem;
+}
+
+.play-screen--compact #new-pattern-btn {
+  min-height: 34px;
+  padding: 6px 16px;
+  font-size: 0.9rem;
+}
+
+.how-to-play li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  counter-increment: step;
+}
+
+.how-to-play li::before {
+  content: counter(step);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex: none;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--ink);
+  border-radius: 50%;
+}
+
+.how-to-play strong {
+  color: var(--ink);
+}
+
+.settings-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.settings-row[hidden] {
+  display: none;
+}
+
+.settings-row-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.segmented {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.segment {
+  min-height: 40px;
+  padding: 6px 14px;
+  font-family: "Nunito", system-ui, sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.segment:hover,
+.segment:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(58, 54, 48, 0.1);
+}
+
+.segment:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.segment-active {
+  background: var(--ink);
+  color: #ffffff;
+  border-color: var(--ink);
+}
+
+/* flex-start rather than (safe) center: layoutGrids() in script.js
+   measures real available space and shrinks cell size (and, as a last
+   resort, the gap between cells) so content should always fit without
+   scrolling — but on an extremely short/narrow screen, even minimum-
+   size cells plus the surrounding chrome (how-to-play strip, buttons,
+   palette) can still be taller than the viewport, since that chrome
+   itself isn't shrunk. `safe center` was tried as a fallback for that
+   extreme case but rendered content pushed off the TOP of the screen
+   instead of gracefully falling back to start-alignment (observed on
+   a 600x400 viewport) — top-alignment avoids that failure mode
+   unconditionally: whatever doesn't fit is guaranteed to be visible
+   from the top down rather than centered content spilling off both
+   edges. `overflow: auto` stays as a last-resort safety net for that
+   same extreme case (content taller than viewport even at minimum
+   sizes) rather than something expected to trigger in normal use. */
+.game-area {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 0;
+  gap: 16px;
+  padding: 8px 16px 16px;
+  overflow: auto;
+}
+
+.section-label {
+  margin: 0 0 6px;
+  font-family: "Baloo 2", "Nunito", sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--ink);
+}
+
+.grid {
+  display: grid;
+  gap: 8px;
+}
+
+/* Sizing comes entirely from the grid track (JS sets an exact pixel
+   cell size on grid-template-columns/rows — see layoutGrids() in
+   script.js), not from the cell here — a cell-level min-width/height
+   would fight the measured size JS computed to guarantee everything
+   fits on screen. */
+.cell {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 0;
+  cursor: pointer;
+  touch-action: none;
+  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cell:hover,
+.cell:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(58, 54, 48, 0.12);
+}
+
+.cell:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.grid-locked .cell {
+  cursor: default;
+}
+
+.grid-locked .cell:hover {
+  transform: none;
+  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.08);
+}
+
+.palette {
+  display: flex;
+  justify-content: center;
+  gap: var(--swatch-gap, 16px);
+  flex-wrap: wrap;
+  max-width: 480px;
+}
+
+/* Size is normally set inline by layoutGrids() in script.js (via
+   --swatch-size), which shrinks the palette toward MIN_SWATCH_SIZE
+   when needed so a large colour count (6 colours + eraser wrapping to
+   two rows) doesn't eat a disproportionate share of the vertical
+   budget the grids need — the palette is chrome from the grid's point
+   of view, same as the how-to-play strip or buttons. This clamp() is
+   only the pre-JS/fallback value. */
+.swatch {
+  position: relative;
+  width: var(--swatch-size, clamp(40px, 5vw, 56px));
+  height: var(--swatch-size, clamp(40px, 5vw, 56px));
+  border: 1px solid var(--card-border);
+  border-radius: 50%;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.swatch:hover,
+.swatch:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(58, 54, 48, 0.12);
+}
+
+.swatch:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.swatch-active {
+  box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--ink);
+}
+
+.swatch-eraser {
+  background-image:
+    linear-gradient(45deg, var(--card-border) 25%, transparent 25%, transparent 75%, var(--card-border) 75%),
+    linear-gradient(45deg, var(--card-border) 25%, transparent 25%, transparent 75%, var(--card-border) 75%);
+  background-size: 12px 12px;
+  background-position: 0 0, 6px 6px;
+}
+
+/* Per-colour shape, layered over the fill so tiles/swatches are
+   identifiable without relying on hue alone (colour-vision deficiency,
+   greyscale displays). mix-blend-mode: multiply darkens whatever fill
+   sits behind it, so one rule works across every colour with no
+   per-colour glyph tint to keep in sync. */
+.shape-glyph {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.32);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+#status {
+  min-height: 1.5em;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--ink);
+}
+
+#new-pattern-btn {
+  min-height: 44px;
+  padding: 10px 22px;
+  font-family: "Baloo 2", "Nunito", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.08);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+#new-pattern-btn:hover,
+#new-pattern-btn:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(58, 54, 48, 0.12);
+}
+
+#new-pattern-btn:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

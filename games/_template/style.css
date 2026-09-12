@@ -1,0 +1,40 @@
+/* Standalone: do not import from /shared/. Copy/paste values instead. */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: #f7f5f0;
+  color: #2b2b2b;
+}
+
+.game-header {
+  padding: 12px 16px;
+}
+
+#ls-exit {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 8px 16px;
+  font-size: 1rem;
+  color: #2b2b2b;
+  text-decoration: none;
+  background: #ffffff;
+  border-radius: 8px;
+}
+
+.game-area {
+  padding: 24px 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

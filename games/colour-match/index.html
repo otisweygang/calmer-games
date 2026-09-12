@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Colour Match</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="game-header">
+    <a id="ls-exit" href="../../index.html" aria-label="Back to home">← Home</a>
+  </header>
+
+  <main class="game-area" id="game-area">
+    <section id="setup-screen" class="screen">
+      <div class="panel settings-panel" aria-label="Settings">
+        <h1 class="setup-title">Colour Match</h1>
+        <p class="setup-intro">Set up your game, then start.</p>
+
+        <div class="settings-groups">
+          <div class="settings-row">
+            <span class="settings-row-label" id="size-label">Grid size</span>
+            <div class="segmented" role="group" aria-labelledby="size-label" id="size-options"></div>
+          </div>
+
+          <div class="settings-row">
+            <span class="settings-row-label" id="colours-label">Number of colours</span>
+            <div class="segmented" role="group" aria-labelledby="colours-label" id="colour-count-options"></div>
+          </div>
+
+          <div class="settings-row">
+            <span class="settings-row-label" id="mode-label">Pattern</span>
+            <div class="segmented" role="group" aria-labelledby="mode-label" id="mode-options"></div>
+          </div>
+
+          <div class="settings-row" id="picture-row" hidden>
+            <span class="settings-row-label" id="picture-label">Picture</span>
+            <div class="segmented" role="group" aria-labelledby="picture-label" id="picture-options"></div>
+          </div>
+        </div>
+
+        <button id="play-btn" type="button" class="play-btn">Play</button>
+      </div>
+    </section>
+
+    <section id="play-screen" class="screen" hidden>
+      <button id="change-settings-btn" type="button" class="change-settings-btn">⚙ Change settings</button>
+
+      <ol class="how-to-play">
+        <li>Look at <strong>Match this</strong>.</li>
+        <li>Pick a colour below.</li>
+        <li>Tap squares in <strong>Your grid</strong> to paint them.</li>
+      </ol>
+
+      <div class="game-row-wrap" id="game-row-wrap">
+        <div class="game-row" id="game-row">
+          <div class="panel" aria-label="Pattern to match">
+            <h2 class="section-label">Match this</h2>
+            <div id="target-grid" class="grid grid-locked"></div>
+          </div>
+
+          <div class="panel" aria-label="Your grid">
+            <h2 class="section-label">Your grid</h2>
+            <div id="player-grid" class="grid"></div>
+          </div>
+        </div>
+      </div>
+
+      <div aria-label="Colour palette">
+        <h2 class="section-label">Pick a colour</h2>
+        <div id="palette" class="palette"></div>
+      </div>
+
+      <p id="status" role="status" aria-live="polite"></p>
+
+      <button id="new-pattern-btn" type="button">New pattern</button>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+  <script src="../../shared/lock.js"></script>
+</body>
+</html>

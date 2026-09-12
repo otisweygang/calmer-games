@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Constellation Sky</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a id="ls-exit" href="../../index.html" aria-label="Back to home">← Home</a>
+
+  <h1 id="title">Constellation Sky</h1>
+
+  <div id="coords" aria-hidden="true"></div>
+
+  <div id="hint">Tap two stars to connect them</div>
+
+  <div id="star-info" aria-hidden="true"></div>
+
+  <canvas id="sky-canvas" aria-label="Star sky, drag to look around"></canvas>
+
+  <aside id="constellation-list-wrap">
+    <button id="list-toggle-btn" type="button" aria-expanded="true" aria-controls="constellation-list">
+      Constellations
+    </button>
+    <ul id="constellation-list"></ul>
+  </aside>
+
+  <noscript>This game needs JavaScript and a browser with WebGL support to run.</noscript>
+
+  <div id="controls">
+    <button id="guide-btn" type="button" class="icon-btn active" data-tooltip="Constellations">✨</button>
+    <button id="globe-btn" type="button" class="icon-btn" data-tooltip="Globe view">🌐</button>
+    <button id="clear-btn" type="button" class="icon-btn" data-tooltip="Clear">✕</button>
+  </div>
+
+  <div id="confirm-modal" class="modal-backdrop" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="confirm-text">
+      <p id="confirm-text">Clear all your lines?</p>
+      <div class="modal-btns">
+        <button id="confirm-cancel" type="button" class="modal-btn">Cancel</button>
+        <button id="confirm-clear" type="button" class="modal-btn modal-btn-danger">Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
+  <script src="../../shared/lock.js"></script>
+</body>
+</html>
