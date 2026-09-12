@@ -1,16 +1,23 @@
 /* Portal shell only. Never imported by games. */
 
-@import url("https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Nunito:wght@400;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;700&display=swap");
 
 * {
   box-sizing: border-box;
 }
 
 :root {
-  --bg: #fdf6ec;
+  --bg: #fbf3e7;
+  --bg-soft: #f5ead9;
   --ink: #3a3630;
   --ink-soft: #6b6459;
-  --card-border: rgba(58, 54, 48, 0.08);
+  --card-border: rgba(58, 54, 48, 0.09);
+  --card-bg: #fffdf9;
+  --accent-sun: #e8935c;
+  --accent-sage: #7ba098;
+  --accent-rose: #c97b84;
+  --accent-gold: #cf9f3f;
+  --shadow-color: rgba(58, 54, 48, 0.1);
 }
 
 body {
@@ -19,39 +26,57 @@ body {
   font-family: "Nunito", system-ui, sans-serif;
   background: var(--bg);
   background-image:
-    radial-gradient(circle at 10% 15%, rgba(255, 210, 170, 0.35), transparent 40%),
-    radial-gradient(circle at 90% 10%, rgba(170, 210, 255, 0.3), transparent 40%),
-    radial-gradient(circle at 50% 100%, rgba(190, 230, 190, 0.3), transparent 45%);
+    radial-gradient(circle at 8% 12%, rgba(232, 147, 92, 0.14), transparent 40%),
+    radial-gradient(circle at 92% 8%, rgba(123, 160, 152, 0.16), transparent 42%),
+    radial-gradient(circle at 50% 100%, rgba(201, 123, 132, 0.12), transparent 45%);
   color: var(--ink);
 }
 
 header {
-  padding: 40px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 44px 16px 28px;
   text-align: center;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-mark {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
 }
 
 header h1 {
   margin: 0;
-  font-family: "Baloo 2", "Nunito", sans-serif;
-  font-size: clamp(1.8rem, 5vw, 2.6rem);
-  font-weight: 700;
+  font-family: "Fredoka", "Nunito", sans-serif;
+  font-size: clamp(1.7rem, 5vw, 2.4rem);
+  font-weight: 600;
+  letter-spacing: 0.01em;
   color: var(--ink);
 }
 
 header p.tagline {
-  margin: 8px 0 0;
+  margin: 0;
+  max-width: 32ch;
   color: var(--ink-soft);
-  font-size: 1.05rem;
+  font-size: 1.02rem;
 }
 
 #game-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 220px));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 260px));
   justify-content: center;
-  gap: 20px;
+  gap: 22px;
   width: 100%;
-  padding: 8px 20px 40px;
-  max-width: 960px;
+  padding: 12px 20px 48px;
+  max-width: 980px;
   margin: 0 auto;
 }
 
@@ -59,21 +84,23 @@ header p.tagline {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
-  min-height: 150px;
-  padding: 20px;
+  gap: 12px;
+  min-height: 168px;
+  padding: 22px;
+  background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 24px;
+  border-radius: 20px;
   text-decoration: none;
   color: var(--ink);
-  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.08);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 3px 0 var(--shadow-color);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .game-card:hover,
 .game-card:focus-visible {
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(58, 54, 48, 0.12);
+  box-shadow: 0 8px 20px var(--shadow-color);
+  border-color: rgba(58, 54, 48, 0.16);
 }
 
 .game-card:focus-visible {
@@ -82,18 +109,30 @@ header p.tagline {
 }
 
 .game-icon {
-  font-size: 2.2rem;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  flex-shrink: 0;
+}
+
+.game-icon svg {
+  width: 26px;
+  height: 26px;
 }
 
 .game-title {
-  font-family: "Baloo 2", "Nunito", sans-serif;
-  font-size: 1.2rem;
-  font-weight: 700;
+  font-family: "Fredoka", "Nunito", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.005em;
 }
 
 .game-desc {
   font-size: 0.92rem;
+  line-height: 1.4;
   color: var(--ink-soft);
 }
 

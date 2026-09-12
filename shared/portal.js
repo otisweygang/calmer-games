@@ -1,14 +1,21 @@
 // Portal shell only. Never imported by games.
 // To add a game: add its folder name to shared/games.json, e.g. ["colour-match"]
 
-// Card colour + icon cycle through this list per game. Not tied to any
-// game's own palette — purely portal decoration.
+// Card icon colour cycles through this list per game. Not tied to any
+// game's own palette — purely portal decoration. Icon artwork itself
+// comes from shared/icons/<folder>.svg (falls back to default-game.svg).
 const CARD_THEMES = [
-  { bg: "#FFE3D1", icon: "🎨" },
-  { bg: "#D8F0DB", icon: "🔢" },
-  { bg: "#DCE8FA", icon: "🧩" },
-  { bg: "#F4E3F7", icon: "⭐" },
+  { bg: "#FBEADC", fg: "#E8935C" },
+  { bg: "#E4EFEC", fg: "#7BA098" },
+  { bg: "#F5E6E8", fg: "#C97B84" },
+  { bg: "#F6EFD9", fg: "#CF9F3F" },
 ];
+
+async function loadIcon(folder) {
+  const res = await fetch(`shared/icons/${folder}.svg`);
+  if (res.ok) return res.text();
+  return fetch("shared/icons/default-game.svg").then((r) => r.text());
+}
 
 async function loadGames() {
   const list = await fetch("shared/games.json").then((r) => r.json());
@@ -24,13 +31,13 @@ async function loadGames() {
       r.json()
     );
     const theme = CARD_THEMES[i % CARD_THEMES.length];
+    const iconSvg = await loadIcon(folder);
 
     const card = document.createElement("a");
     card.className = "game-card";
     card.href = `games/${folder}/${manifest.entry}`;
-    card.style.backgroundColor = theme.bg;
     card.innerHTML = `
-      <span class="game-icon" aria-hidden="true">${theme.icon}</span>
+      <span class="game-icon" style="background:${theme.bg}; color:${theme.fg}">${iconSvg}</span>
       <span class="game-title">${manifest.title}</span>
       <span class="game-desc">${manifest.description}</span>
     `;
