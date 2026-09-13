@@ -1,0 +1,953 @@
+/* Standalone: do not import from /shared/. Copy/paste values instead. */
+
+@import url("https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Nunito:wght@400;600;700&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #fdf6ec;
+  --ink: #3a3630;
+  --ink-soft: #6b6459;
+  --card-border: rgba(58, 54, 48, 0.08);
+
+  --reed: #6f9a63;
+  --water-line: #d8e9e2;
+
+  /* Breath depth, 0 (fully out) .. 1 (fully in), set by script.js.
+     Everything in the scene reads from this one value so nothing can
+     drift out of sync. */
+  --breath: 0;
+
+  /* Exhale strength, 0 .. 1. Rises only during the out-breath and is
+     what actually pushes petals and mist across the pond. Kept separate
+     from --breath so the inhale can draw things back gently rather than
+     just reversing the same curve. */
+  --gust: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  font-family: "Nunito", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  overflow: hidden;
+}
+
+.game-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+}
+
+#ls-exit {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  min-width: 36px;
+  padding: 4px 12px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.12);
+  cursor: pointer;
+}
+
+.game-area {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.screen {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 0;
+}
+
+.screen[hidden] {
+  display: none;
+}
+
+/* ---------- Setup screen ---------- */
+
+#setup-screen {
+  padding: 0 16px;
+  background:
+    radial-gradient(circle at 12% 12%, rgba(180, 220, 190, 0.4), transparent 42%),
+    radial-gradient(circle at 88% 14%, rgba(170, 210, 225, 0.36), transparent 42%),
+    radial-gradient(circle at 50% 100%, rgba(205, 228, 200, 0.42), transparent 48%),
+    var(--bg);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 18px 16px;
+  background: #ffffff;
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.08);
+}
+
+.settings-panel {
+  align-items: stretch;
+  gap: 18px;
+  width: 100%;
+  max-width: 400px;
+  padding: 28px 24px 32px;
+}
+
+.settings-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+}
+
+.setup-title {
+  margin: 0;
+  font-family: "Baloo 2", "Nunito", sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--ink);
+}
+
+.setup-intro {
+  margin: -8px 0 0;
+  font-size: 0.95rem;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
+.play-btn {
+  min-height: 52px;
+  margin-top: 6px;
+  font-family: "Baloo 2", "Nunito", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--ink);
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.2);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.play-btn:hover,
+.play-btn:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(58, 54, 48, 0.25);
+}
+
+.play-btn:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.settings-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.settings-row-label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.segmented {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.segmented--stack {
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+}
+
+.seg-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 8px 16px;
+  font-family: "Nunito", system-ui, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  text-align: center;
+  background: var(--bg);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.seg-btn .seg-sub {
+  font-size: 0.75rem;
+  font-weight: 600;
+  opacity: 0.75;
+}
+
+.seg-btn:hover,
+.seg-btn:focus-visible {
+  color: var(--ink);
+  box-shadow: 0 4px 10px rgba(58, 54, 48, 0.1);
+}
+
+.seg-btn:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.seg-btn[aria-pressed="true"] {
+  color: #ffffff;
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+/* ---------- Play screen ---------- */
+
+#play-screen {
+  position: relative;
+  padding: 0;
+}
+
+/* Floating chrome, dimmed so it never competes with the scene. It comes
+   back to full strength on hover or keyboard focus. */
+.play-toolbar {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0.55;
+  transition: opacity 0.25s ease;
+}
+
+.play-toolbar:hover,
+.play-toolbar:focus-within {
+  opacity: 1;
+}
+
+.menu-btn,
+.scene-btn,
+.pause-btn {
+  min-height: 40px;
+  padding: 6px 16px;
+  font-family: "Nunito", system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.12);
+}
+
+.menu-btn:focus-visible,
+.scene-btn:focus-visible,
+.pause-btn:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* The pond fills the screen. No panel, no border, no frame — the scene
+   is the interface. */
+.pond {
+  position: relative;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* All scenes stack in the same box; only one is visible at a time.
+   Switching cross-fades rather than cutting, so changing place is not a
+   jolt in the middle of a breath. */
+.scene {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+  transition: opacity 0.45s ease;
+}
+
+.scene[hidden] {
+  display: none;
+}
+
+.scene--fading {
+  opacity: 0;
+}
+
+/* ---------- Scene layers ---------- */
+
+/* Parallax: far layers drift a little against the breath, near layers
+   more. Gives the pond depth without any layer moving enough to read as
+   an indicator. */
+.layer-far {
+  transform: translateY(calc(var(--breath) * -3px));
+}
+
+/* Reeds bend AWAY from the frog on the exhale, as if the breath reaches
+   the bank. --lean carries the sign per side (set inline in the HTML),
+   so left-hand reeds lean left and right-hand ones lean right instead of
+   the whole bank tilting one way. */
+.layer-reeds-far path {
+  fill: none;
+  stroke: var(--reed);
+  stroke-width: 5;
+  stroke-linecap: round;
+  transform-origin: bottom center;
+  transform: rotate(calc(var(--gust) * var(--lean, 1) * 1.8deg));
+}
+
+.layer-reeds-near path {
+  fill: none;
+  stroke: #547f4e;
+  stroke-width: 9;
+  stroke-linecap: round;
+  opacity: 0.85;
+  transform-origin: bottom center;
+  transform: rotate(calc(var(--gust) * var(--lean, 1) * 3deg));
+}
+
+.foreground-pad {
+  transform: translateY(calc(var(--gust) * 3px));
+}
+
+.water-bands {
+  transform: translateX(calc(var(--gust) * 14px));
+}
+
+/* Surface rings spread outward on the exhale, as though the breath
+   pushes the water. Opacity falls as they widen so they dissolve
+   rather than stack up. */
+.breath-ring {
+  fill: none;
+  stroke: var(--water-line);
+  stroke-width: 2;
+  transform-origin: 400px 392px;
+  transform-box: view-box;
+  transform: scale(calc(0.55 + var(--gust) * 0.75));
+  opacity: calc(0.5 - var(--gust) * 0.3);
+}
+
+/* ---------- The frog ---------- */
+
+/* Whole-frog motion is small and postural: he settles a touch as he
+   empties, rather than inflating like a balloon. */
+.frog {
+  transform: translateY(calc(var(--breath) * -5px));
+  transform-origin: 400px 404px;
+  transform-box: view-box;
+}
+
+.frog-torso,
+.frog-skull {
+  /* Deliberately not scaled by the breath. */
+  stroke: #4f7a41;
+  stroke-width: 1.5;
+}
+
+.frog-haunch {
+  fill: #567f45;
+}
+
+.frog-speckles ellipse {
+  fill: #4e7a3f;
+  opacity: 0.22;
+}
+
+.frog-belly {
+  fill: #d5e6b4;
+  opacity: 0.55;
+}
+
+.lily {
+  transform-origin: 400px 404px;
+  transform-box: view-box;
+  transform: rotate(calc(var(--gust) * -0.7deg));
+}
+
+/* THE breath signal: the sac swells outward and downward from under the
+   chin while the body is still. Y-origin is at the chin so it grows
+   away from the head instead of about its own centre. */
+.frog-head {
+  transform: translateY(calc(var(--breath) * -3px));
+  transform-origin: 400px 340px;
+  transform-box: view-box;
+}
+
+.frog-eye {
+  transform: scaleY(calc(1 - var(--breath) * 0.3));
+  transform-origin: center center;
+  transform-box: fill-box;
+  transition: transform 0.12s ease;
+}
+
+.frog-eye--blink {
+  transform: scaleY(0.08);
+}
+
+.frog-eye-ball {
+  fill: #fcfaf0;
+  stroke: #4f7a41;
+  stroke-width: 2;
+}
+
+.frog-eye-pupil {
+  fill: #2f2b26;
+}
+
+.frog-eye-shine {
+  fill: #ffffff;
+  opacity: 0.92;
+}
+
+.frog-mouth {
+  fill: none;
+  stroke: #4f7a41;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+}
+
+.frog-nostril {
+  fill: #4f7a41;
+  opacity: 0.65;
+}
+
+.frog-reflection {
+  transform: translateY(calc(var(--breath) * 3px));
+  opacity: calc(0.75 - var(--gust) * 0.3);
+}
+
+/* ---------- Things the breath moves ---------- */
+
+/* Petals and seeds. Each carries its own resting position and a drift
+   vector; --gust pushes them along it, so the exhale visibly blows the
+   pond outward and the inhale lets it settle back. */
+.drifter {
+  transform:
+    translate(
+      calc(var(--gust) * var(--push-x, 60px)),
+      calc(var(--gust) * var(--push-y, -18px))
+    )
+    rotate(calc(var(--gust) * var(--spin, 40deg)));
+  transform-origin: center;
+  transform-box: fill-box;
+  opacity: calc(0.45 + var(--gust) * 0.4);
+}
+
+/* Mist puffs are created on each exhale and removed when their
+   animation ends — this is the one thing that is genuinely emitted
+   rather than merely displaced. */
+.mist-puff {
+  animation: mist-drift var(--dur, 3.4s) ease-out forwards;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+@keyframes mist-drift {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.35);
+  }
+  15% {
+    opacity: 1;
+  }
+  65% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--mx, 180px), var(--my, 30px)) scale(2.4);
+  }
+}
+
+/* ---------- Ocean / whale ---------- */
+
+.light-shafts {
+  /* Shafts sway a little on the exhale, as if the water is disturbed. */
+  transform: translateX(calc(var(--gust) * 16px));
+  opacity: calc(0.6 + var(--breath) * 0.25);
+}
+
+.kelp-layer path {
+  fill: none;
+  stroke: #2f7a6a;
+  stroke-width: 10;
+  stroke-linecap: round;
+  opacity: 0.7;
+  transform-origin: bottom center;
+  transform: rotate(calc(var(--gust) * var(--lean, 1) * 4deg));
+}
+
+.whale {
+  transform: translateY(calc(var(--breath) * -8px));
+  transform-origin: 400px 400px;
+  transform-box: view-box;
+}
+
+.whale-body {
+  stroke: #2b466f;
+  stroke-width: 2;
+}
+
+.whale-fin {
+  fill: #3c5c88;
+  transform-origin: 372px 336px;
+  transform-box: view-box;
+  transform: rotate(calc(var(--gust) * 7deg));
+}
+
+.whale-tail {
+  transform-origin: 556px 320px;
+  transform-box: view-box;
+  /* Slow sweep through the cycle, so the whale is swimming, not parked. */
+  transform: rotate(calc(-4deg + var(--breath) * 9deg));
+}
+
+.whale-tail-shape {
+  fill: #3c5c88;
+}
+
+.whale-belly {
+  fill: #c9dced;
+  opacity: 0.55;
+}
+
+.whale-ridge {
+  fill: none;
+  stroke: #6f93bd;
+  stroke-width: 3;
+  stroke-linecap: round;
+  opacity: 0.35;
+}
+
+/* The pleats are the whale's breath signal: a rorqual's throat grooves
+   stretch open as it fills. Scaling these rather than the whole animal
+   keeps it from reading as a balloon. */
+.whale-pleats path {
+  fill: none;
+  stroke: #274266;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  opacity: 0.35;
+  transform-origin: 300px 318px;
+  transform-box: view-box;
+  transform: scaleY(calc(0.5 + var(--breath) * 0.95));
+}
+
+.whale-eye {
+  fill: #19304d;
+}
+
+.whale-eye-shine {
+  fill: #ffffff;
+  opacity: 0.85;
+}
+
+.whale-mouth {
+  fill: none;
+  stroke: #274266;
+  stroke-width: 3;
+  stroke-linecap: round;
+  opacity: 0.6;
+}
+
+.whale-blowhole {
+  fill: #22385a;
+}
+
+.seabed {
+  transform: translateY(calc(var(--gust) * 4px));
+}
+
+/* Bubbles rise instead of drifting sideways. */
+.bubble {
+  animation: bubble-rise var(--dur, 3.4s) ease-out forwards;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+@keyframes bubble-rise {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4);
+  }
+  12% {
+    opacity: 0.95;
+  }
+  70% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--mx, 20px), var(--my, -300px)) scale(1.5);
+  }
+}
+
+/* ---------- Snow / fox ---------- */
+
+.stars circle {
+  fill: #f2f6ff;
+  opacity: 0.85;
+}
+
+.moon-glow {
+  opacity: calc(0.75 + var(--breath) * 0.2);
+}
+
+.bough-layer path {
+  fill: none;
+  stroke: #23406a;
+  stroke-width: 11;
+  stroke-linecap: round;
+  opacity: 0.9;
+  transform-origin: bottom center;
+  transform: rotate(calc(var(--gust) * var(--lean, 1) * 3deg));
+}
+
+.fox {
+  transform: translateY(calc(var(--breath) * -6px));
+  transform-origin: 400px 424px;
+  transform-box: view-box;
+}
+
+.fox-body {
+  stroke: #8d431f;
+  stroke-width: 2;
+  /* The ribcage lifts as the fox fills — small and vertical only, so it
+     reads as breathing rather than inflating. */
+  transform: scaleY(calc(1 + var(--breath) * 0.07));
+  transform-origin: 400px 424px;
+  transform-box: view-box;
+}
+
+.fox-chest {
+  fill: #f6ece0;
+  opacity: 0.9;
+  transform: scaleY(calc(1 + var(--breath) * 0.1));
+  transform-origin: 400px 424px;
+  transform-box: view-box;
+}
+
+.fox-tail {
+  fill: #b85c2c;
+  transform-origin: 486px 400px;
+  transform-box: view-box;
+  transform: rotate(calc(var(--gust) * -3deg));
+}
+
+.fox-tail-tip {
+  fill: #f6ece0;
+  opacity: 0.92;
+  transform-origin: 486px 400px;
+  transform-box: view-box;
+  transform: rotate(calc(var(--gust) * -3deg));
+}
+
+.fox-head {
+  transform: translateY(calc(var(--breath) * -4px));
+  transform-origin: 324px 370px;
+  transform-box: view-box;
+}
+
+.fox-skull {
+  stroke: #8d431f;
+  stroke-width: 2;
+}
+
+.fox-ear {
+  fill: #b85c2c;
+}
+
+.fox-ear-inner {
+  fill: #2f2a2c;
+  opacity: 0.55;
+}
+
+.fox-muzzle,
+.fox-cheek {
+  fill: #f6ece0;
+}
+
+.fox-cheek {
+  opacity: 0.85;
+}
+
+.fox-eye {
+  fill: #2f2a2c;
+  transform: scaleY(calc(1 - var(--breath) * 0.3));
+  transform-origin: center center;
+  transform-box: fill-box;
+  transition: transform 0.12s ease;
+}
+
+.fox-eye-shine {
+  fill: #ffffff;
+  opacity: 0.9;
+}
+
+.fox-nose {
+  fill: #2f2a2c;
+}
+
+/* Snowflakes fall continuously and are blown sideways by the exhale.
+   Two nested groups because one element cannot run a fall animation and
+   carry a gust translate on the same `transform` property — the outer
+   group is blown sideways, the inner one falls. */
+.snow-gust {
+  transform: translateX(calc(var(--gust) * var(--push-x, 60px)));
+}
+
+.snow-fall {
+  animation: snow-fall var(--dur, 12s) linear var(--delay, 0s) infinite;
+}
+
+.snowflake {
+  fill: #ffffff;
+  opacity: 0.85;
+}
+
+@keyframes snow-fall {
+  from { transform: translateY(-60px); }
+  to   { transform: translateY(340px); }
+}
+
+/* ---------- Breath cue ---------- */
+
+/* Sits in the sky above the frog. Positioned as a percentage of the pond
+   rather than pinned to the SVG, so it stays clear of his head at every
+   aspect ratio the viewBox switches between. */
+.breath-cue {
+  position: absolute;
+  top: 14%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  align-items: baseline;
+  gap: 0.45em;
+  margin: 0;
+  font-family: "Baloo 2", "Nunito", sans-serif;
+  color: var(--ink);
+  text-align: center;
+  white-space: nowrap;
+  pointer-events: none;
+  /* Soft halo rather than a solid chip: keeps the sky visible behind it
+     while staying legible over the pale gradient. */
+  text-shadow:
+    0 2px 10px rgba(253, 246, 236, 0.95),
+    0 0 22px rgba(253, 246, 236, 0.85);
+}
+
+.breath-cue-word {
+  font-size: clamp(1.3rem, 3.4vw, 2rem);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  opacity: 0.82;
+}
+
+.breath-cue-count {
+  font-size: clamp(1.9rem, 5vw, 3rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Fireflies ---------- */
+
+.fireflies {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.firefly {
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  width: var(--size, 7px);
+  height: var(--size, 7px);
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff6c4 0%, #f3d977 45%, rgba(243, 217, 119, 0) 70%);
+  opacity: calc((1 - var(--breath)) * var(--glow, 0.9) * 0.55 + 0.3);
+  animation: firefly-drift var(--dur, 18s) ease-in-out var(--delay, 0s) infinite alternate;
+}
+
+@keyframes firefly-drift {
+  from { transform: translate(0, 0); }
+  to   { transform: translate(var(--dx, 20px), var(--dy, -16px)); }
+}
+
+/* ---------- Menu drawer ---------- */
+
+.menu-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(58, 54, 48, 0.28);
+  z-index: 20;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.menu-backdrop[hidden] {
+  display: none;
+}
+
+.menu-backdrop.menu-backdrop--visible {
+  opacity: 1;
+}
+
+.menu-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 21;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 18px;
+  width: min(320px, 86vw);
+  padding: 20px 20px 28px;
+  background: #ffffff;
+  border-right: 1px solid var(--card-border);
+  box-shadow: 8px 0 24px rgba(58, 54, 48, 0.18);
+  overflow-y: auto;
+  transform: translateX(-100%);
+  transition: transform 0.22s ease;
+}
+
+.menu-drawer[hidden] {
+  display: none;
+}
+
+.menu-drawer.menu-drawer--open {
+  transform: translateX(0);
+}
+
+.menu-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.menu-drawer-title {
+  margin: 0;
+  font-family: "Baloo 2", "Nunito", sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.menu-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  min-height: 40px;
+  font-size: 1.1rem;
+  color: var(--ink-soft);
+  background: var(--bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.menu-close-btn:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.menu-settings-groups .settings-row {
+  align-items: flex-start;
+}
+
+.menu-settings-groups .settings-row-label {
+  text-align: left;
+}
+
+.menu-settings-groups .segmented {
+  justify-content: flex-start;
+}
+
+.menu-hint {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+
+/* Screen-reader-only: the scene carries the cue visually, but a
+   non-visual user still needs to know which phase they are in. */
+#status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Motion is the whole mechanic, so reduced motion cannot simply switch
+   it off. The scene holds a steady mid-breath pose, emitted mist and
+   fireflies are suppressed, and #status keeps announcing each phase so
+   the guidance itself survives. */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .fireflies,
+  .mist-layer {
+    display: none;
+  }
+}

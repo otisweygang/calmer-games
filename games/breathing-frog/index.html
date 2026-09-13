@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Breathing Frog</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="game-header">
+    <a id="ls-exit" href="../../index.html" aria-label="Exit">Exit</a>
+  </header>
+
+  <main class="game-area" id="game-area">
+    <section id="setup-screen" class="screen">
+      <div class="panel settings-panel" aria-label="Settings">
+        <h1 class="setup-title">Breathing Frog</h1>
+        <p class="setup-intro">The frog breathes out and the pond moves. Breathe with him.</p>
+
+        <div class="settings-groups">
+          <div class="settings-row">
+            <span class="settings-row-label" id="scene-label">Place</span>
+            <div class="segmented" role="group" aria-labelledby="scene-label" id="scene-options"></div>
+          </div>
+
+          <div class="settings-row">
+            <span class="settings-row-label" id="pattern-label">Breathing</span>
+            <div class="segmented segmented--stack" role="group" aria-labelledby="pattern-label" id="pattern-options"></div>
+          </div>
+
+          <div class="settings-row">
+            <span class="settings-row-label" id="sound-label">Sound</span>
+            <div class="segmented" role="group" aria-labelledby="sound-label" id="sound-options"></div>
+          </div>
+        </div>
+
+        <button id="play-btn" type="button" class="play-btn">Start</button>
+      </div>
+    </section>
+
+    <section id="play-screen" class="screen" hidden>
+      <!-- Toolbar floats over the scene so the pond is never boxed in by
+           chrome. Fades down until hovered/focused. -->
+      <div class="play-toolbar">
+        <button id="menu-btn" type="button" class="menu-btn" aria-haspopup="true" aria-expanded="false" aria-controls="menu-drawer">☰ Menu</button>
+        <button id="scene-btn" type="button" class="scene-btn">Change place</button>
+        <button id="pause-btn" type="button" class="pause-btn">Pause</button>
+      </div>
+
+      <div class="pond" id="pond">
+        <!-- Each scene is its own SVG, shown one at a time. Switching
+             only toggles which is visible — the breath state lives in
+             script.js and the CSS variables, so changing place never
+             restarts the cycle or moves the counter. -->
+
+        <!-- ============ POND / FROG ============ -->
+        <svg
+          id="scene-frog"
+          class="scene"
+          data-scene="frog"
+          viewBox="0 0 800 500"
+          preserveAspectRatio="xMidYMid slice"
+          role="img"
+          aria-labelledby="scene-title"
+          focusable="false"
+        >
+          <title id="scene-title">A frog on a lily pad, breathing on a quiet pond</title>
+
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#cfe4ea" />
+              <stop offset="55%" stop-color="#e6eedd" />
+              <stop offset="100%" stop-color="#f3f0dd" />
+            </linearGradient>
+
+            <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#b9d4cd" />
+              <stop offset="45%" stop-color="#9cc3bc" />
+              <stop offset="100%" stop-color="#7faea6" />
+            </linearGradient>
+
+            <linearGradient id="water2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#a8cac3" />
+              <stop offset="100%" stop-color="#7daba4" />
+            </linearGradient>
+
+            <radialGradient id="frogSkin" cx="42%" cy="28%" r="78%">
+              <stop offset="0%" stop-color="#9cc47e" />
+              <stop offset="55%" stop-color="#7aa863" />
+              <stop offset="100%" stop-color="#5d8a4c" />
+            </radialGradient>
+
+            <radialGradient id="frogHead" cx="45%" cy="25%" r="80%">
+              <stop offset="0%" stop-color="#a3cb84" />
+              <stop offset="60%" stop-color="#7fac66" />
+              <stop offset="100%" stop-color="#638e50" />
+            </radialGradient>
+
+            <linearGradient id="padTop" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#8fbc84" />
+              <stop offset="100%" stop-color="#6d9b6a" />
+            </linearGradient>
+
+            <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#fff6d8" stop-opacity="0.85" />
+              <stop offset="100%" stop-color="#fff6d8" stop-opacity="0" />
+            </radialGradient>
+
+            <!-- Slightly blue-white rather than pure white: against a pale
+                 sky and pale water, pure white mist is invisible. -->
+            <radialGradient id="mistPuff" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95" />
+              <stop offset="55%" stop-color="#eaf6f7" stop-opacity="0.5" />
+              <stop offset="100%" stop-color="#d6ecef" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+
+          <!-- ---------- Sky and far bank ----------
+               Sky and water are drawn well outside the default viewBox so
+               that widening it for portrait screens (fitScene in
+               script.js) never exposes bare background. -->
+          <rect class="sky" x="-200" y="-400" width="1200" height="700" fill="url(#sky)" />
+          <circle class="sun" cx="628" cy="96" r="130" fill="url(#sunGlow)" />
+          <circle cx="628" cy="96" r="30" fill="#fdf3cf" opacity="0.75" />
+
+          <!-- Far hills: drift very slightly, giving depth without motion
+               that competes with the breath. -->
+          <g class="layer-far">
+            <ellipse cx="150" cy="292" rx="250" ry="72" fill="#b9cfae" opacity="0.55" />
+            <ellipse cx="560" cy="296" rx="300" ry="60" fill="#aac5a2" opacity="0.5" />
+            <ellipse cx="790" cy="290" rx="180" ry="66" fill="#c2d4b4" opacity="0.45" />
+          </g>
+
+          <!-- Far reeds sit on the bank, behind the water. -->
+          <g class="layer-reeds-far" opacity="0.5">
+            <path style="--lean: -1" d="M92 296 C88 256 96 232 104 210" />
+            <path style="--lean: -1" d="M108 298 C106 262 100 240 92 222" />
+            <path style="--lean: 1" d="M700 296 C704 258 698 234 690 214" />
+            <path style="--lean: 1" d="M716 298 C714 262 722 238 730 220" />
+            <path style="--lean: 1" d="M676 298 C672 268 678 248 684 232" />
+          </g>
+
+          <!-- ---------- Water ---------- -->
+          <rect class="water" x="-200" y="296" width="1200" height="500" fill="url(#water)" />
+          <rect x="-200" y="296" width="1200" height="6" fill="#d8e9e2" opacity="0.6" />
+
+          <!-- Slow horizontal water bands, for a surface that is never
+               perfectly static. -->
+          <g class="water-bands" opacity="0.35">
+            <ellipse cx="180" cy="340" rx="190" ry="5" fill="#d3e8e0" />
+            <ellipse cx="620" cy="366" rx="220" ry="5" fill="#d3e8e0" />
+            <ellipse cx="330" cy="404" rx="240" ry="6" fill="#cfe4dc" />
+            <ellipse cx="640" cy="448" rx="200" ry="6" fill="#cfe4dc" />
+          </g>
+
+          <!-- Breath-driven surface rings, centred on the frog. -->
+          <g class="breath-rings" aria-hidden="true">
+            <ellipse class="breath-ring" cx="400" cy="392" rx="120" ry="26" />
+            <ellipse class="breath-ring" cx="400" cy="392" rx="180" ry="38" />
+            <ellipse class="breath-ring" cx="400" cy="392" rx="250" ry="52" />
+          </g>
+
+          <!-- Drifting particles the breath actually moves. Populated by
+               script.js so counts can scale down on weak hardware. -->
+          <g class="drift-layer" id="drift-layer" aria-hidden="true"></g>
+
+          <!-- ---------- Lily pads ---------- -->
+          <g class="pad-group pad-group--back">
+            <ellipse cx="168" cy="356" rx="70" ry="19" fill="#6d9b6a" opacity="0.75" />
+            <ellipse cx="648" cy="372" rx="58" ry="16" fill="#6d9b6a" opacity="0.7" />
+          </g>
+
+          <!-- ---------- The frog ---------- -->
+          <g class="frog" id="frog">
+            <!-- Reflection first, so the frog sits on top of it. -->
+            <g class="frog-reflection" aria-hidden="true">
+              <ellipse cx="400" cy="470" rx="96" ry="26" fill="#5d8a4c" opacity="0.16" />
+            </g>
+
+            <!-- Main pad, drawn under the frog. -->
+            <g class="lily" id="lily">
+              <ellipse cx="400" cy="404" rx="150" ry="36" fill="url(#padTop)" />
+              <path d="M400 404 L474 384 A40 22 0 0 1 474 424 Z" fill="#e8f0dc" opacity="0.35" />
+              <ellipse cx="400" cy="398" rx="150" ry="34" fill="#9cc48e" opacity="0.35" />
+            </g>
+
+            <!-- Body is deliberately NOT scaled with the breath. A real
+                 frog holds its body still and inflates only the throat
+                 sac; scaling the whole animal reads as a balloon, and as
+                 a progress indicator. -->
+            <g class="frog-body">
+              <ellipse class="frog-haunch" cx="318" cy="374" rx="52" ry="34" />
+              <ellipse class="frog-haunch" cx="482" cy="374" rx="52" ry="34" />
+
+              <ellipse class="frog-torso" cx="400" cy="352" rx="94" ry="58" fill="url(#frogSkin)" />
+
+              <!-- Dappled markings, so the skin is not a flat fill. -->
+              <g class="frog-speckles" aria-hidden="true">
+                <ellipse cx="356" cy="330" rx="13" ry="9" />
+                <ellipse cx="440" cy="336" rx="10" ry="7" />
+                <ellipse cx="392" cy="368" rx="15" ry="9" />
+                <ellipse cx="330" cy="358" rx="9" ry="6" />
+                <ellipse cx="462" cy="364" rx="11" ry="7" />
+              </g>
+
+              <ellipse class="frog-belly" cx="400" cy="374" rx="60" ry="32" />
+
+              <g class="frog-head" id="frog-head">
+                <ellipse class="frog-skull" cx="400" cy="290" rx="78" ry="52" fill="url(#frogHead)" />
+
+                <circle class="frog-skull" cx="356" cy="256" r="30" fill="url(#frogHead)" />
+                <circle class="frog-skull" cx="444" cy="256" r="30" fill="url(#frogHead)" />
+
+                <g class="frog-eye" id="eye-left">
+                  <ellipse class="frog-eye-ball" cx="356" cy="252" rx="17" ry="17" />
+                  <ellipse class="frog-eye-pupil" cx="356" cy="253" rx="8" ry="9" />
+                  <circle class="frog-eye-shine" cx="351" cy="247" r="3.4" />
+                </g>
+
+                <g class="frog-eye" id="eye-right">
+                  <ellipse class="frog-eye-ball" cx="444" cy="252" rx="17" ry="17" />
+                  <ellipse class="frog-eye-pupil" cx="444" cy="253" rx="8" ry="9" />
+                  <circle class="frog-eye-shine" cx="439" cy="247" r="3.4" />
+                </g>
+
+                <path class="frog-mouth" d="M370 308 Q400 322 430 308" />
+                <circle class="frog-nostril" cx="388" cy="296" r="2.6" />
+                <circle class="frog-nostril" cx="412" cy="296" r="2.6" />
+              </g>
+
+            </g>
+          </g>
+
+          <!-- Mist the frog actually breathes out. -->
+          <g class="mist-layer" id="mist-layer" aria-hidden="true"></g>
+
+          <!-- ---------- Foreground ---------- -->
+          <g class="layer-reeds-near" aria-hidden="true">
+            <path style="--lean: -1" d="M40 500 C30 430 46 386 62 348" />
+            <path style="--lean: -1" d="M66 500 C60 436 48 398 34 366" />
+            <path style="--lean: -1" d="M96 500 C92 448 104 414 118 386" />
+            <path style="--lean: 1" d="M744 500 C752 432 738 388 722 352" />
+            <path style="--lean: 1" d="M716 500 C712 440 724 400 738 372" />
+            <path style="--lean: 1" d="M686 500 C690 452 680 420 666 394" />
+          </g>
+
+          <ellipse class="foreground-pad" cx="120" cy="486" rx="120" ry="28" fill="#5f8d5e" opacity="0.5" />
+          <ellipse class="foreground-pad" cx="700" cy="496" rx="130" ry="30" fill="#5f8d5e" opacity="0.45" />
+        </svg>
+
+        <!-- ============ OCEAN / WHALE ============
+             Same mechanic, inverted direction: the exhale sends a column
+             of bubbles UP toward the surface, and pushes kelp and
+             plankton outward. -->
+        <svg
+          id="scene-whale"
+          class="scene"
+          data-scene="whale"
+          viewBox="0 0 800 500"
+          preserveAspectRatio="xMidYMid slice"
+          role="img"
+          aria-labelledby="whale-title"
+          focusable="false"
+          hidden
+        >
+          <title id="whale-title">A whale drifting in deep water, breathing out bubbles</title>
+
+          <defs>
+            <linearGradient id="deep" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#7fc0d4" />
+              <stop offset="35%" stop-color="#4e94b4" />
+              <stop offset="100%" stop-color="#1f4f74" />
+            </linearGradient>
+
+            <radialGradient id="whaleSkin" cx="40%" cy="25%" r="80%">
+              <stop offset="0%" stop-color="#6f93bd" />
+              <stop offset="55%" stop-color="#4c6f9c" />
+              <stop offset="100%" stop-color="#32507a" />
+            </radialGradient>
+
+            <radialGradient id="sunShaft" cx="50%" cy="0%" r="70%">
+              <stop offset="0%" stop-color="#d8f2fb" stop-opacity="0.5" />
+              <stop offset="100%" stop-color="#d8f2fb" stop-opacity="0" />
+            </radialGradient>
+
+            <radialGradient id="bubbleFill" cx="35%" cy="30%" r="65%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9" />
+              <stop offset="60%" stop-color="#d7f0fa" stop-opacity="0.4" />
+              <stop offset="100%" stop-color="#bfe6f5" stop-opacity="0.1" />
+            </radialGradient>
+
+            <!-- Keeps the stretching throat pleats inside the whale's
+                 silhouette; without this they spill past the belly as the
+                 breath fills and read as loose scribble. -->
+            <clipPath id="whaleBodyClip">
+              <path d="M232 308 C240 262 300 238 388 240 C482 242 548 268 566 300 C548 336 476 366 386 368 C298 370 240 350 232 308 Z" />
+            </clipPath>
+          </defs>
+
+          <rect class="sea" x="-200" y="-400" width="1200" height="1400" fill="url(#deep)" />
+
+          <!-- Light shafts from the surface, drifting with the breath. -->
+          <g class="light-shafts">
+            <polygon points="180,-40 250,-40 400,520 250,520" fill="url(#sunShaft)" />
+            <polygon points="470,-40 520,-40 640,520 540,520" fill="url(#sunShaft)" />
+            <polygon points="30,-40 70,-40 150,520 60,520" fill="url(#sunShaft)" />
+          </g>
+
+          <!-- Far silhouettes: a distant pod, barely visible. -->
+          <g class="layer-far" opacity="0.16">
+            <ellipse cx="120" cy="150" rx="52" ry="16" fill="#123a5c" />
+            <ellipse cx="690" cy="196" rx="40" ry="12" fill="#123a5c" />
+          </g>
+
+          <!-- Plankton motes the breath pushes around. -->
+          <g class="drift-layer" id="drift-layer-whale" aria-hidden="true"></g>
+
+          <!-- Bubbles rise from the blowhole on each exhale. -->
+          <g class="mist-layer" id="mist-layer-whale" aria-hidden="true"></g>
+
+          <!-- Kelp, anchored to the seabed, swaying away on the exhale. -->
+          <g class="kelp-layer" aria-hidden="true">
+            <path style="--lean: -1" d="M60 500 C40 420 70 360 50 300" />
+            <path style="--lean: -1" d="M104 500 C86 430 112 372 96 316" />
+            <path style="--lean: -1" d="M150 500 C136 440 158 392 148 344" />
+            <path style="--lean: 1" d="M742 500 C762 420 732 358 752 298" />
+            <path style="--lean: 1" d="M700 500 C716 432 692 374 706 314" />
+            <path style="--lean: 1" d="M654 500 C668 442 646 394 656 346" />
+          </g>
+
+          <g class="whale" id="whale">
+            <!-- Tail: sweeps slowly with the breath. -->
+            <g class="whale-tail">
+              <path class="whale-tail-shape" d="M556 318 C596 300 634 286 664 276 C650 300 648 322 656 344 C630 336 592 330 558 334 Z" />
+            </g>
+
+            <!-- Pectoral fin, behind the body. -->
+            <ellipse class="whale-fin" cx="372" cy="344" rx="42" ry="16" />
+
+            <!-- Tapered body: a plain ellipse read as a floating pill, so
+                 the silhouette narrows toward the tail and rounds at the
+                 head the way a real rorqual does. -->
+            <path class="whale-body" d="M232 308 C240 262 300 238 388 240 C482 242 548 268 566 300 C548 336 476 366 386 368 C298 370 240 350 232 308 Z" fill="url(#whaleSkin)" />
+
+            <!-- Underside and pleats both clipped to the silhouette. -->
+            <g clip-path="url(#whaleBodyClip)">
+              <path class="whale-belly" d="M244 320 C300 366 470 370 556 306 C512 364 300 372 244 320 Z" />
+
+              <!-- Throat pleats: a real rorqual's grooves stretch open as
+                   it fills. Scaling these rather than the whole animal is
+                   the breath cue — the body never changes size. -->
+              <g class="whale-pleats" id="whale-pleats">
+                <path d="M258 318 C288 344 318 352 342 350" />
+                <path d="M284 328 C312 354 342 362 366 360" />
+                <path d="M310 334 C336 360 366 368 390 366" />
+                <path d="M336 338 C362 362 390 370 414 368" />
+              </g>
+            </g>
+
+            <!-- Dorsal ridge, for a little form on an otherwise flat back. -->
+            <path class="whale-ridge" d="M300 250 C360 240 448 248 520 272" />
+
+            <ellipse class="whale-eye" cx="286" cy="296" rx="7" ry="8" />
+            <circle class="whale-eye-shine" cx="284" cy="293" r="2.4" />
+            <path class="whale-mouth" d="M234 314 C266 332 306 340 344 338" />
+
+            <!-- Blowhole: where the bubbles are emitted. -->
+            <ellipse class="whale-blowhole" cx="336" cy="244" rx="10" ry="5" />
+          </g>
+
+          <!-- Seabed in the foreground. -->
+          <ellipse class="seabed" cx="400" cy="520" rx="620" ry="70" fill="#17405f" opacity="0.55" />
+        </svg>
+
+        <!-- ============ SNOW / FOX ============
+             The exhale is visible frost-breath, and it pushes falling
+             snow and the pine boughs outward. -->
+        <svg
+          id="scene-fox"
+          class="scene"
+          data-scene="fox"
+          viewBox="0 0 800 500"
+          preserveAspectRatio="xMidYMid slice"
+          role="img"
+          aria-labelledby="fox-title"
+          focusable="false"
+          hidden
+        >
+          <title id="fox-title">A fox curled in the snow at night, breathing out frost</title>
+
+          <defs>
+            <linearGradient id="nightSky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#2b3b63" />
+              <stop offset="55%" stop-color="#4a5c86" />
+              <stop offset="100%" stop-color="#8496b4" />
+            </linearGradient>
+
+            <linearGradient id="snowField" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#dfe7f2" />
+              <stop offset="100%" stop-color="#aeb9d0" />
+            </linearGradient>
+
+            <radialGradient id="foxFur" cx="40%" cy="28%" r="78%">
+              <stop offset="0%" stop-color="#e0854a" />
+              <stop offset="55%" stop-color="#c96a35" />
+              <stop offset="100%" stop-color="#a5502a" />
+            </radialGradient>
+
+            <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#f4f7ff" stop-opacity="0.8" />
+              <stop offset="100%" stop-color="#f4f7ff" stop-opacity="0" />
+            </radialGradient>
+
+            <radialGradient id="frostPuff" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95" />
+              <stop offset="55%" stop-color="#dce8fb" stop-opacity="0.45" />
+              <stop offset="100%" stop-color="#c6d8f5" stop-opacity="0" />
+            </radialGradient>
+          </defs>
+
+          <rect class="night" x="-200" y="-400" width="1200" height="800" fill="url(#nightSky)" />
+
+          <!-- Stars. Static: twinkling would compete with the breath. -->
+          <g class="stars" aria-hidden="true">
+            <circle cx="90" cy="58" r="1.8" /><circle cx="168" cy="120" r="1.3" />
+            <circle cx="246" cy="46" r="1.6" /><circle cx="330" cy="104" r="1.2" />
+            <circle cx="470" cy="62" r="1.7" /><circle cx="556" cy="132" r="1.3" />
+            <circle cx="646" cy="52" r="1.5" /><circle cx="726" cy="112" r="1.8" />
+            <circle cx="404" cy="30" r="1.3" /><circle cx="612" cy="196" r="1.2" />
+            <circle cx="120" cy="186" r="1.2" /><circle cx="760" cy="176" r="1.4" />
+          </g>
+
+          <circle class="moon-glow" cx="654" cy="96" r="120" fill="url(#moonGlow)" />
+          <circle class="moon" cx="654" cy="96" r="34" fill="#f6f8ff" />
+          <circle cx="666" cy="86" r="7" fill="#e2e8f5" opacity="0.7" />
+          <circle cx="644" cy="108" r="5" fill="#e2e8f5" opacity="0.55" />
+
+          <!-- Distant treeline. -->
+          <g class="layer-far" opacity="0.5">
+            <path d="M-20 300 L40 196 L100 300 Z" fill="#2c3c5e" />
+            <path d="M60 300 L128 172 L196 300 Z" fill="#33456a" />
+            <path d="M168 300 L226 204 L284 300 Z" fill="#2c3c5e" />
+            <path d="M520 300 L580 188 L640 300 Z" fill="#2c3c5e" />
+            <path d="M612 300 L684 164 L756 300 Z" fill="#33456a" />
+            <path d="M726 300 L790 200 L854 300 Z" fill="#2c3c5e" />
+          </g>
+
+          <!-- Snow field. -->
+          <path class="snow-field" d="M-200 300 C120 276 300 292 420 286 C560 280 700 296 1000 286 L1000 900 L-200 900 Z" fill="url(#snowField)" />
+
+          <!-- Falling snow the breath pushes sideways. -->
+          <g class="drift-layer" id="drift-layer-fox" aria-hidden="true"></g>
+
+          <!-- Frost breath from the muzzle. -->
+          <g class="mist-layer" id="mist-layer-fox" aria-hidden="true"></g>
+
+          <!-- Pine boughs that bend away on the exhale. -->
+          <g class="bough-layer" aria-hidden="true">
+            <path style="--lean: -1" d="M40 500 C34 424 62 380 46 330" />
+            <path style="--lean: -1" d="M96 500 C88 438 110 398 98 356" />
+            <path style="--lean: 1" d="M756 500 C764 420 736 378 754 328" />
+            <path style="--lean: 1" d="M702 500 C710 440 688 398 700 354" />
+          </g>
+
+          <g class="fox" id="fox">
+            <!-- Shadow on the snow. -->
+            <ellipse cx="400" cy="424" rx="150" ry="26" fill="#7f8cab" opacity="0.4" />
+
+            <!-- Tail curls around the front, the way a resting fox lies. -->
+            <path class="fox-tail" d="M486 400 C580 408 610 356 576 322 C560 366 520 378 484 372 Z" />
+            <path class="fox-tail-tip" d="M576 322 C598 340 596 372 570 386 C588 366 588 340 576 322 Z" />
+
+            <ellipse class="fox-body" cx="400" cy="374" rx="126" ry="56" fill="url(#foxFur)" />
+            <path class="fox-chest" d="M300 396 C340 418 452 420 496 396 C452 428 342 428 300 396 Z" />
+
+            <g class="fox-head" id="fox-head">
+              <!-- Ears. -->
+              <path class="fox-ear" d="M268 292 L286 230 L318 276 Z" />
+              <path class="fox-ear-inner" d="M280 288 L290 252 L306 280 Z" />
+              <path class="fox-ear" d="M382 286 L378 226 L344 272 Z" />
+              <path class="fox-ear-inner" d="M372 282 L370 250 L354 276 Z" />
+
+              <ellipse class="fox-skull" cx="324" cy="318" rx="66" ry="52" fill="url(#foxFur)" />
+
+              <!-- Pale cheek ruff, tucked against the jaw rather than
+                   floating as a separate blob over the face. -->
+              <path class="fox-cheek" d="M300 344 C286 372 320 386 356 378 C382 372 388 350 378 336 C356 352 324 352 300 344 Z" />
+
+              <!-- Muzzle: pale, tapering forward from the skull, and
+                   where the frost-breath comes from. -->
+              <path class="fox-muzzle" d="M290 332 C258 334 228 346 218 358 C230 372 258 378 288 372 C306 366 310 342 290 332 Z" />
+
+              <ellipse class="fox-eye" cx="306" cy="306" rx="7.5" ry="8.5" />
+              <ellipse class="fox-eye" cx="360" cy="304" rx="7.5" ry="8.5" />
+              <circle class="fox-eye-shine" cx="304" cy="303" r="2.6" />
+              <circle class="fox-eye-shine" cx="358" cy="301" r="2.6" />
+
+              <ellipse class="fox-nose" cx="220" cy="357" rx="9" ry="7.5" />
+            </g>
+          </g>
+
+          <!-- Foreground snow bank. -->
+          <ellipse cx="120" cy="512" rx="230" ry="48" fill="#c6d0e3" opacity="0.6" />
+          <ellipse cx="700" cy="520" rx="250" ry="52" fill="#c6d0e3" opacity="0.55" />
+        </svg>
+
+        <!-- Fireflies live outside the SVG so they can be positioned in
+             percentages against the pond box at any aspect ratio. -->
+        <div class="fireflies" id="fireflies" aria-hidden="true"></div>
+
+        <!-- Breath cue above the frog: the phase word plus its remaining
+             seconds. aria-hidden because #status announces phase changes
+             to screen readers without the per-second countdown. -->
+        <p class="breath-cue" id="breath-cue" aria-hidden="true">
+          <span class="breath-cue-word" id="breath-cue-word">In</span>
+          <span class="breath-cue-count" id="breath-cue-count">4</span>
+        </p>
+      </div>
+
+      <!-- Screen-reader-only. There is deliberately no visible countdown,
+           progress bar or phase label: the pond itself is the cue. -->
+      <p id="status" role="status" aria-live="polite"></p>
+    </section>
+
+    <div id="menu-backdrop" class="menu-backdrop" hidden></div>
+
+    <aside id="menu-drawer" class="menu-drawer" hidden aria-label="Menu">
+      <div class="menu-drawer-header">
+        <h2 class="menu-drawer-title">Menu</h2>
+        <button id="menu-close-btn" type="button" class="menu-close-btn" aria-label="Close menu">✕</button>
+      </div>
+
+      <div class="settings-groups menu-settings-groups">
+        <div class="settings-row">
+          <span class="settings-row-label" id="menu-scene-label">Place</span>
+          <div class="segmented" role="group" aria-labelledby="menu-scene-label" id="menu-scene-options"></div>
+        </div>
+
+        <div class="settings-row">
+          <span class="settings-row-label" id="menu-pattern-label">Breathing</span>
+          <div class="segmented segmented--stack" role="group" aria-labelledby="menu-pattern-label" id="menu-pattern-options"></div>
+        </div>
+
+        <div class="settings-row">
+          <span class="settings-row-label" id="menu-sound-label">Sound</span>
+          <div class="segmented" role="group" aria-labelledby="menu-sound-label" id="menu-sound-options"></div>
+        </div>
+      </div>
+
+      <p class="menu-hint">The frog breathes out, and the pond moves with him. Just watch, and breathe along.</p>
+    </aside>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
