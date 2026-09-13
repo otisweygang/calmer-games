@@ -403,8 +403,11 @@ body {
   font-size: 0.8rem;
 }
 
-.play-screen--compact #status {
+.play-screen--compact #status:not(:empty) {
   min-height: 1.1em;
+}
+
+.play-screen--compact #status {
   font-size: 0.95rem;
 }
 
@@ -661,12 +664,27 @@ body {
   pointer-events: none;
 }
 
+/* Collapses entirely while empty so it contributes no height (and no
+   .screen row-gap above it) to the bottom of the play screen — an
+   always-reserved 1.5em line plus that gap read as a dead band of
+   background under the grids. Once JS puts text in it the :not(:empty)
+   rule restores the reserved line, so appearing text still doesn't
+   shift the grids. layoutGrids() measures children live, so the
+   reclaimed space goes straight into the grids. */
 #status {
-  min-height: 1.5em;
+  margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
   text-align: center;
   color: var(--ink);
+}
+
+#status:empty {
+  display: none;
+}
+
+#status:not(:empty) {
+  min-height: 1.5em;
 }
 
 .new-pattern-btn {

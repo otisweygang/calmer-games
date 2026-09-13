@@ -645,13 +645,23 @@ function layoutGrids(isRetry) {
     (parseFloat(areaCompStyle.paddingTop) || 0) + (parseFloat(areaCompStyle.paddingBottom) || 0);
   const areaContentHeight = areaRect.height - areaPaddingY;
 
+  // Only children that actually render contribute height AND flex gaps.
+  // Display-none children (the empty #status, the hidden how-to-play
+  // strip) generate no gap, so counting them in gapCount would reserve
+  // vertical space that nothing occupies — leaving a dead band under
+  // the grids, which is exactly what the budget is meant to reclaim.
   let usedHeight = 0;
+  let renderedCount = 0;
   for (const child of playScreen.children) {
+    const childHeight = child.getBoundingClientRect().height;
+    const rendered = childHeight > 0 || child.getClientRects().length > 0;
+    if (!rendered) continue;
+    renderedCount += 1;
     if (child === playAreaWrap) continue;
-    usedHeight += child.getBoundingClientRect().height;
+    usedHeight += childHeight;
   }
   const screenStyle = getComputedStyle(playScreen);
-  const gapCount = playScreen.children.length - 1;
+  const gapCount = renderedCount - 1;
   const screenGap = parseFloat(screenStyle.rowGap || screenStyle.gap || "0") || 0;
   usedHeight += screenGap * Math.max(0, gapCount);
   let heightBudget = Math.max(0, areaContentHeight - usedHeight);
