@@ -27,7 +27,10 @@
     </section>
 
     <section id="play-screen" class="screen" hidden>
-      <button id="change-settings-btn" type="button" class="change-settings-btn">⚙ Change settings</button>
+      <div class="play-toolbar">
+        <button id="menu-btn" type="button" class="menu-btn" aria-haspopup="true" aria-expanded="false" aria-controls="menu-drawer">☰ Menu</button>
+        <button id="new-puzzle-btn" type="button" class="new-puzzle-btn">New puzzle</button>
+      </div>
 
       <div class="panel board-panel" aria-label="Sudoku board">
         <div id="board" class="board"></div>
@@ -38,9 +41,23 @@
       </div>
 
       <p id="status" role="status" aria-live="polite"></p>
-
-      <button id="new-puzzle-btn" type="button">New puzzle</button>
     </section>
+
+    <div id="menu-backdrop" class="menu-backdrop" hidden></div>
+
+    <aside id="menu-drawer" class="menu-drawer" hidden aria-label="Menu">
+      <div class="menu-drawer-header">
+        <h2 class="menu-drawer-title">Menu</h2>
+        <button id="menu-close-btn" type="button" class="menu-close-btn" aria-label="Close menu">✕</button>
+      </div>
+
+      <div class="settings-groups menu-settings-groups">
+        <div class="settings-row">
+          <span class="settings-row-label" id="menu-difficulty-label">Difficulty</span>
+          <div class="segmented" role="group" aria-labelledby="menu-difficulty-label" id="menu-difficulty-options"></div>
+        </div>
+      </div>
+    </aside>
   </main>
 
   <script src="vendor/sudoku.js"></script>

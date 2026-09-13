@@ -222,19 +222,74 @@ function buildSegmented(container, options, current, onSelect) {
   });
 }
 
-function renderSettingsPanel() {
+// Renders the settings controls into a given set of element ids — used
+// for both the setup screen (prefix "") and the in-play menu drawer
+// (prefix "menu-"), mirroring the colour-match game's treatment so the
+// two share one rendering path instead of duplicating this logic.
+function renderSettingsControls(ids) {
   buildSegmented(
-    document.getElementById("difficulty-options"),
+    document.getElementById(ids.difficulty),
     DIFFICULTIES,
     settings.difficulty,
     (value) => updateSetting("difficulty", value)
   );
 }
 
+function renderSettingsPanel() {
+  renderSettingsControls({ difficulty: "difficulty-options" });
+}
+
+function renderMenuDrawer() {
+  renderSettingsControls({ difficulty: "menu-difficulty-options" });
+}
+
+// Settings can be changed from two places: the setup screen (before a
+// game starts — takes effect on next Play, no live puzzle behind it)
+// and the in-play menu drawer (changed while a puzzle is already in
+// progress — takes effect immediately by generating a new puzzle,
+// since there's a real board on screen for the player to see react).
 function updateSetting(key, value) {
   settings[key] = value;
   saveSettings();
   renderSettingsPanel();
+  renderMenuDrawer();
+  if (!document.getElementById("play-screen").hidden) {
+    startNewPuzzle();
+  }
+}
+
+// --- Menu drawer (in-play settings) ---
+
+function openMenuDrawer() {
+  renderMenuDrawer();
+  const drawer = document.getElementById("menu-drawer");
+  const backdrop = document.getElementById("menu-backdrop");
+  drawer.hidden = false;
+  backdrop.hidden = false;
+  // Force layout before adding the transition-triggering class, so the
+  // slide-in actually animates instead of snapping straight to open
+  // (toggling a transform-affecting class in the same tick it becomes
+  // visible can get coalesced by the browser into one paint).
+  void drawer.offsetWidth;
+  drawer.classList.add("menu-drawer--open");
+  backdrop.classList.add("menu-backdrop--visible");
+  document.getElementById("menu-btn").setAttribute("aria-expanded", "true");
+}
+
+function closeMenuDrawer() {
+  const drawer = document.getElementById("menu-drawer");
+  const backdrop = document.getElementById("menu-backdrop");
+  drawer.classList.remove("menu-drawer--open");
+  backdrop.classList.remove("menu-backdrop--visible");
+  document.getElementById("menu-btn").setAttribute("aria-expanded", "false");
+  const hide = () => {
+    drawer.hidden = true;
+    backdrop.hidden = true;
+  };
+  // Match the CSS transition duration so the drawer/backdrop stay
+  // visible (and hittable) throughout the slide-out instead of
+  // vanishing instantly.
+  window.setTimeout(hide, 220);
 }
 
 // --- Screen navigation ---
@@ -273,7 +328,14 @@ function init() {
   checkComplete();
 
   document.getElementById("play-btn").addEventListener("click", startGame);
-  document.getElementById("change-settings-btn").addEventListener("click", showSetupScreen);
+  document.getElementById("menu-btn").addEventListener("click", openMenuDrawer);
+  document.getElementById("menu-close-btn").addEventListener("click", closeMenuDrawer);
+  document.getElementById("menu-backdrop").addEventListener("click", closeMenuDrawer);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && document.getElementById("menu-drawer").classList.contains("menu-drawer--open")) {
+      closeMenuDrawer();
+    }
+  });
   document.getElementById("new-puzzle-btn").addEventListener("click", startNewPuzzle);
 
   if (resuming) {

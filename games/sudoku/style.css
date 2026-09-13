@@ -133,8 +133,16 @@ body {
   outline-offset: 2px;
 }
 
-.change-settings-btn {
-  align-self: center;
+.play-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.menu-btn,
+.new-puzzle-btn {
   min-height: 40px;
   padding: 6px 16px;
   font-family: "Nunito", system-ui, sans-serif;
@@ -147,15 +155,122 @@ body {
   cursor: pointer;
 }
 
-.change-settings-btn:hover,
-.change-settings-btn:focus-visible {
+.menu-btn:hover,
+.menu-btn:focus-visible,
+.new-puzzle-btn:hover,
+.new-puzzle-btn:focus-visible {
   color: var(--ink);
   box-shadow: 0 4px 10px rgba(58, 54, 48, 0.1);
 }
 
-.change-settings-btn:focus-visible {
+.menu-btn:focus-visible,
+.new-puzzle-btn:focus-visible {
   outline: 3px solid var(--ink);
   outline-offset: 2px;
+}
+
+.menu-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(58, 54, 48, 0.28);
+  z-index: 20;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.menu-backdrop[hidden] {
+  display: none;
+}
+
+.menu-backdrop.menu-backdrop--visible {
+  opacity: 1;
+}
+
+.menu-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 21;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 18px;
+  width: min(320px, 86vw);
+  padding: 20px 20px 28px;
+  background: #ffffff;
+  border-right: 1px solid var(--card-border);
+  box-shadow: 8px 0 24px rgba(58, 54, 48, 0.18);
+  overflow-y: auto;
+  transform: translateX(-100%);
+  transition: transform 0.22s ease;
+}
+
+.menu-drawer[hidden] {
+  display: none;
+}
+
+.menu-drawer.menu-drawer--open {
+  transform: translateX(0);
+}
+
+.menu-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.menu-drawer-title {
+  margin: 0;
+  font-family: "Baloo 2", "Nunito", sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.menu-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  min-height: 40px;
+  font-size: 1.1rem;
+  color: var(--ink-soft);
+  background: var(--bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.menu-close-btn:hover,
+.menu-close-btn:focus-visible {
+  color: var(--ink);
+  box-shadow: 0 4px 10px rgba(58, 54, 48, 0.1);
+}
+
+.menu-close-btn:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.menu-settings-groups .settings-row {
+  align-items: flex-start;
+}
+
+.menu-settings-groups .settings-row-label {
+  text-align: left;
+}
+
+.menu-settings-groups .segmented {
+  justify-content: flex-start;
+}
+
+.settings-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
 }
 
 .settings-row {
@@ -346,32 +461,6 @@ body {
   font-weight: 600;
   text-align: center;
   color: var(--ink);
-}
-
-#new-puzzle-btn {
-  min-height: 44px;
-  padding: 10px 22px;
-  font-family: "Baloo 2", "Nunito", sans-serif;
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--ink);
-  background: #ffffff;
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
-  cursor: pointer;
-  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.08);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-#new-puzzle-btn:hover,
-#new-puzzle-btn:focus-visible {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(58, 54, 48, 0.12);
-}
-
-#new-puzzle-btn:focus-visible {
-  outline: 3px solid var(--ink);
-  outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {

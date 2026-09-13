@@ -2,11 +2,25 @@
 
 ## Current state
 Standard 9x9 sudoku. Setup screen picks a difficulty (Easy / Medium /
-Hard / Very Hard); play screen shows the board, a 1-9 number pad, and
-Erase. Tap a cell to select it (outlined), then tap a number to fill it
-— same select-then-act interaction as colour-match's paint flow, chosen
-for consistency and because it works identically on touch and mouse
-without relying on a native `<input>` or keyboard.
+Hard / Very Hard); play screen shows a toolbar ("☰ Menu" + "New
+puzzle"), the board, a 1-9 number pad, and Erase. Tap a cell to select
+it (outlined), then tap a number to fill it — same select-then-act
+interaction as colour-match's paint flow, chosen for consistency and
+because it works identically on touch and mouse without relying on a
+native `<input>` or keyboard.
+
+"☰ Menu" opens the same left-aligned slide-in drawer treatment as
+colour-match (`#menu-drawer` + `#menu-backdrop`, `openMenuDrawer()` /
+`closeMenuDrawer()` in script.js) instead of swapping to a separate
+settings screen — it contains the same Difficulty control as the setup
+screen, rendered via one shared `renderSettingsControls(ids)` function
+parameterised by element-id prefix (`""` for the setup screen, `"menu-"`
+for the drawer), same reasoning as colour-match's settings duplication
+avoidance. Unlike the setup screen (takes effect on next Play),
+changing difficulty in the in-play drawer takes effect immediately —
+`updateSetting()` calls `startNewPuzzle()` right away whenever
+`#play-screen` is visible, since there's a real board on screen for the
+player to see react.
 
 Insane and Inhuman (the two hardest built-in tiers, 26 and 17 givens)
 were deliberately left off the setup screen — they can take real
