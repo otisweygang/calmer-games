@@ -534,6 +534,12 @@ body {
 .grid {
   display: grid;
   gap: 8px;
+  /* Also on the container, not just .cell: a drag that starts or passes
+     through the gap between tiles would otherwise be claimed by the
+     browser as a page scroll/pan and interrupt the stroke. */
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 /* Sizing comes entirely from the grid track (JS sets an exact pixel
@@ -554,7 +560,19 @@ body {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.cell:hover,
+/* The lift-and-shadow hover is a mouse affordance. On a touchscreen
+   :hover latches onto whatever the finger last crossed, so a drag
+   animates a transform + box-shadow on every tile it passes — dozens
+   of composited shadow repaints mid-gesture, and a trail of raised
+   tiles left behind the finger. Restricted to devices that actually
+   hover; keyboard focus keeps the cue regardless. */
+@media (hover: hover) {
+  .cell:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(58, 54, 48, 0.12);
+  }
+}
+
 .cell:focus-visible {
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(58, 54, 48, 0.12);

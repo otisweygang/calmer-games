@@ -338,8 +338,36 @@ function saveSettings() {
   localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
 }
 
+// Dragging across a grid can touch dozens of tiles in a second, and a
+// full stringify + synchronous localStorage write per tile is a
+// blocking disk write in the middle of the gesture — a real source of
+// drag stutter on slow donated hardware. queueSaveState() coalesces
+// them into one write shortly after the finger stops. flushSave()
+// forces it out at every point the state could otherwise be lost (drag
+// end, page hide), so nothing a child painted is ever dropped.
+let pendingSave = false;
+let saveTimer = null;
+
 function saveState() {
+  pendingSave = false;
   localStorage.setItem(STORAGE_KEY, JSON.stringify({ settings, target, playerColours }));
+}
+
+function queueSaveState() {
+  pendingSave = true;
+  if (saveTimer !== null) return;
+  saveTimer = setTimeout(() => {
+    saveTimer = null;
+    if (pendingSave) saveState();
+  }, 250);
+}
+
+function flushSave() {
+  if (saveTimer !== null) {
+    clearTimeout(saveTimer);
+    saveTimer = null;
+  }
+  if (pendingSave) saveState();
 }
 
 function loadState() {
@@ -779,17 +807,57 @@ function layoutGrids(isRetry) {
 
 // Drag-to-paint: press on a tile then drag across others to paint each
 // one with the active colour, mouse and touch alike. Pointer capture
-// keeps move events coming to the grid even once the pointer leaves
-// the original tile, so we look up the tile under the pointer via
-// elementFromPoint instead of relying on the move event's own target.
+// keeps move events coming to the grid even once the pointer leaves the
+// original tile, so the tile under the pointer is resolved from the
+// grid's geometry (see gridMetrics) rather than the move event's own
+// target, which would still name the tile the gesture started on.
 let isPainting = false;
 let lastPaintedIndex = null;
 
+// Geometry of the player grid, measured once at pointerdown and reused
+// for the whole gesture. elementFromPoint() forces the browser to do a
+// hit-test (and hence flush layout) on every pointer sample, which is
+// the sort of per-move cost that adds up badly on slow hardware; the
+// grid is a uniform lattice of equal cells, so which tile a point falls
+// in is just arithmetic. Cleared at pointerdown/stopPainting and on
+// resize, since a relayout invalidates it.
+let gridMetrics = null;
+
+function measureGridMetrics() {
+  const grid = document.getElementById("player-grid");
+  const first = grid?.children[0];
+  if (!grid || !first) return null;
+  const gridRect = grid.getBoundingClientRect();
+  const cellRect = first.getBoundingClientRect();
+  const size = settings.gridSize;
+  if (!cellRect.width || !cellRect.height || size < 1) return null;
+  // Stride = cell size + gap, derived from the grid's own box so it
+  // stays correct whatever gap layoutGrids() settled on.
+  const strideX = size > 1 ? (gridRect.width - cellRect.width) / (size - 1) : cellRect.width;
+  const strideY = size > 1 ? (gridRect.height - cellRect.height) / (size - 1) : cellRect.height;
+  return {
+    left: gridRect.left,
+    top: gridRect.top,
+    cellW: cellRect.width,
+    cellH: cellRect.height,
+    strideX: strideX > 0 ? strideX : cellRect.width,
+    strideY: strideY > 0 ? strideY : cellRect.height,
+    size,
+  };
+}
+
 function paintFromPointer(clientX, clientY) {
-  const el = document.elementFromPoint(clientX, clientY);
-  const cell = el?.closest?.(".cell");
-  if (!cell || cell.dataset.index === undefined) return;
-  const index = Number(cell.dataset.index);
+  if (!gridMetrics) gridMetrics = measureGridMetrics();
+  const m = gridMetrics;
+  if (!m) return;
+  const col = Math.floor((clientX - m.left) / m.strideX);
+  const row = Math.floor((clientY - m.top) / m.strideY);
+  if (col < 0 || col >= m.size || row < 0 || row >= m.size) return;
+  // Reject points that land in the gap between cells rather than on a
+  // tile, so a drag along a seam doesn't paint the neighbouring row.
+  if (clientX - m.left - col * m.strideX > m.cellW) return;
+  if (clientY - m.top - row * m.strideY > m.cellH) return;
+  const index = row * m.size + col;
   if (index === lastPaintedIndex) return;
   lastPaintedIndex = index;
   paintTile(index);
@@ -803,24 +871,39 @@ function initPlayerGridDragPaint() {
     if (!cell) return;
     isPainting = true;
     lastPaintedIndex = null;
+    gridMetrics = measureGridMetrics();
     grid.setPointerCapture(e.pointerId);
     paintFromPointer(e.clientX, e.clientY);
     e.preventDefault();
   });
 
+  // getCoalescedEvents() replays the move samples the browser merged
+  // into this one event. A fast finger between two frames can skip
+  // whole tiles otherwise, which reads as the grid "missing" strokes —
+  // part of what feels janky. Each sample is a cheap index lookup now,
+  // so replaying them is affordable; guard for older browsers.
   grid.addEventListener("pointermove", (e) => {
     if (!isPainting) return;
-    paintFromPointer(e.clientX, e.clientY);
+    const samples = typeof e.getCoalescedEvents === "function" ? e.getCoalescedEvents() : null;
+    if (samples && samples.length > 1) {
+      for (const sample of samples) paintFromPointer(sample.clientX, sample.clientY);
+    } else {
+      paintFromPointer(e.clientX, e.clientY);
+    }
     e.preventDefault();
   });
 
   function stopPainting() {
+    if (!isPainting) return;
     isPainting = false;
     lastPaintedIndex = null;
+    gridMetrics = null;
+    flushSave();
   }
 
   grid.addEventListener("pointerup", stopPainting);
   grid.addEventListener("pointercancel", stopPainting);
+  grid.addEventListener("lostpointercapture", stopPainting);
 
   // Keyboard support: a real mouse/touch tap already paints via
   // pointerdown above, and pointerdown's preventDefault does NOT
@@ -865,10 +948,37 @@ function selectColour(name) {
   renderPalette();
 }
 
+// Repaints ONE tile in place. The full render() rebuilds every cell of
+// both grids (up to 392 elements at 14x14) and re-runs layoutGrids()'s
+// measurement — fine for a one-off redraw, but ruinous per tile while a
+// finger is dragging across the grid, which is what made dragging feel
+// laggy on slower phones. Nothing structural changes when a tile's
+// colour changes (same cell count, same sizes), so the existing element
+// is simply restyled instead.
+function paintTileElement(index) {
+  const grid = document.getElementById("player-grid");
+  const cell = grid?.children[index];
+  if (!cell) return;
+  const colour = colourByName(playerColours[index]);
+  cell.style.backgroundColor = colour.hex;
+  cell.setAttribute("aria-label", `Tile ${index + 1}, ${colour.name}`);
+  const glyph = cell.querySelector(".shape-glyph");
+  if (colour.shape) {
+    if (glyph) {
+      glyph.style.clipPath = SHAPE_CLIP_PATHS[colour.shape];
+    } else {
+      appendShapeGlyph(cell, colour);
+    }
+  } else if (glyph) {
+    glyph.remove();
+  }
+}
+
 function paintTile(index) {
+  if (playerColours[index] === activeColour) return;
   playerColours[index] = activeColour;
-  saveState();
-  render();
+  paintTileElement(index);
+  queueSaveState();
   checkMatch();
 }
 
@@ -1096,7 +1206,19 @@ function init() {
   document.getElementById("new-pattern-btn").addEventListener("click", startNewPattern);
   initPlayerGridDragPaint();
   window.addEventListener("resize", () => {
+    // A relayout moves/resizes every cell, so the cached drag geometry
+    // is stale; drop it rather than painting against old coordinates.
+    gridMetrics = null;
     if (!document.getElementById("play-screen").hidden) layoutGrids();
+  });
+
+  // A coalesced save must not be lost if the tab is closed, the phone
+  // is locked, or the app is backgrounded mid-drag. pagehide plus the
+  // hidden visibilitychange covers those on mobile, where a tab can be
+  // discarded without ever firing unload.
+  window.addEventListener("pagehide", flushSave);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") flushSave();
   });
 
   if (resuming) {
