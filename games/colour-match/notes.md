@@ -16,11 +16,44 @@ colour count, pattern, picture), and a "? How to play" button that
 toggles the numbered how-to-play strip ("1 Look at Match this. 2 Pick a
 colour below. 3 Tap squares in Your grid.") — collapsed/hidden by
 default so it doesn't take up permanent space once a player already
-knows the flow, shown via `toggleHowToPlay()`. Then the two grids side
-by side ("Match this" / "Your grid"), palette, status text, and "New
-pattern". The two grids NEVER stack — `.game-row` is `flex-wrap:
-nowrap` always, at every viewport width (changed from an earlier
-wrapping version — see "Fit-to-viewport" section below for why).
+knows the flow, shown via `toggleHowToPlay()` — and a "New pattern"
+button, all three in one `.play-toolbar` row. Then `#play-area-wrap`:
+the two grids side by side ("Match this" / "Your grid") PLUS the
+colour palette (no visible "Pick a colour" label any more — just the
+bare swatches; `aria-label="Colour palette"` on `.palette-panel`
+still covers accessibility) — then status text. The two grids NEVER
+stack relative to EACH OTHER via wrapping — `.game-row` is
+`flex-wrap: nowrap` always; side-by-side vs stacked is still a
+deliberate JS decision (`.game-row--stacked`), not incidental
+wrapping (see "Fit-to-viewport" section below for why).
+
+"New pattern" means different things per mode, handled in
+`startNewPattern()`: in Random mode, `randomPattern()` already re-rolls
+every tile independently each call, so calling it again is enough. In
+Picture mode, `picturePattern()` is deterministic for a given
+`settings.picture`/`gridSize` — calling it again alone would just
+redraw the exact same picture — so `startNewPattern()` first calls
+`pickNewPicture()`, which reassigns `settings.picture` to a random
+OTHER picture (excluding the current one, when more than one exists)
+and persists it via `saveSettings()`, before regenerating the target.
+
+Palette placement is a FIXED breakpoint (`MOBILE_BREAKPOINT = 500`px
+viewport width, in script.js), unlike every other measurement in this
+file which scales continuously from real measured space — deliberately
+different here because a vertical palette squeezed next to grids that
+have already stacked on a narrow phone is genuinely cramped and harder
+to tap, and there's no sensible "half vertical" state to scale through
+the way cell/swatch size can shrink continuously. Above the breakpoint,
+the palette is a vertical column of swatches to the right of the grids
+(`.palette-panel`, sized against the grids' height budget); below it,
+`isMobileLayout()` (checked fresh on every `layoutGrids()` call,
+including on resize) adds `.play-area-wrap--mobile`, which switches
+`#play-area-wrap` to a column so the palette drops below the grids as
+a horizontal row (`.play-area-wrap--mobile .palette`), sized against
+width the way it always was before the vertical-palette change. Which
+branch is active also changes which budget (height vs width) the
+palette's own footprint gets subtracted from in `layoutGrids()` — see
+the `mobile` branch there.
 
 Toggling the how-to-play strip calls `layoutGrids()` since the strip's
 height feeds into that function's chrome measurement — same reasoning

@@ -69,9 +69,34 @@ body {
   display: none;
 }
 
-.game-row-wrap {
+/* Holds the two grids and the colour palette together. Above the
+   MOBILE_BREAKPOINT (500px, see script.js) the palette sits as a
+   vertical column to the right of the grids (row direction here); below
+   it, on phones, `.play-area-wrap--mobile` (toggled by JS on resize)
+   switches to a column so the palette drops underneath the grids as a
+   horizontal row instead — a fixed breakpoint rather than continuous
+   scaling, since a vertical palette squeezed against stacked grids on a
+   narrow phone is cramped and harder to tap accurately than one row
+   underneath. */
+.play-area-wrap {
   position: relative;
   width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 16px;
+  min-height: 0;
+}
+
+.play-area-wrap--mobile {
+  flex-direction: column;
+  align-items: center;
+}
+
+.game-row-wrap {
+  position: relative;
+  flex: 1 1 auto;
   display: flex;
   justify-content: center;
   min-height: 0;
@@ -371,7 +396,8 @@ body {
 }
 
 .play-screen--compact .menu-btn,
-.play-screen--compact .how-to-play-btn {
+.play-screen--compact .how-to-play-btn,
+.play-screen--compact .new-pattern-btn {
   min-height: 32px;
   padding: 4px 12px;
   font-size: 0.8rem;
@@ -380,12 +406,6 @@ body {
 .play-screen--compact #status {
   min-height: 1.1em;
   font-size: 0.95rem;
-}
-
-.play-screen--compact #new-pattern-btn {
-  min-height: 34px;
-  padding: 6px 16px;
-  font-size: 0.9rem;
 }
 
 .how-to-play li {
@@ -551,12 +571,39 @@ body {
   box-shadow: 0 4px 14px rgba(58, 54, 48, 0.08);
 }
 
+/* Deliberately no card chrome here (no background/border/shadow) —
+   just the section label plus the bare colour swatches, thinner and
+   more streamlined than the boxed `.panel` style used for the two
+   grids. */
+.palette-panel {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+}
+
+/* Vertical stack on the right of the grids rather than a horizontal
+   row below them — column-wrap lets it grow into a second column
+   (leftward) only if it ever runs out of vertical room, same fallback
+   role the old horizontal layout's wrap-to-second-row played. Below
+   MOBILE_BREAKPOINT, `.play-area-wrap--mobile .palette` switches back
+   to the original horizontal row (see `.play-area-wrap--mobile`). */
 .palette {
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
   gap: var(--swatch-gap, 16px);
   flex-wrap: wrap;
-  max-width: 480px;
+  max-height: 100%;
+}
+
+.play-area-wrap--mobile .palette {
+  flex-direction: row;
+  max-height: none;
+  max-width: 100%;
 }
 
 /* Size is normally set inline by layoutGrids() in script.js (via
@@ -568,13 +615,13 @@ body {
    only the pre-JS/fallback value. */
 .swatch {
   position: relative;
-  width: var(--swatch-size, clamp(40px, 5vw, 56px));
-  height: var(--swatch-size, clamp(40px, 5vw, 56px));
-  border: 1px solid var(--card-border);
+  width: var(--swatch-size, clamp(20px, 2.5vw, 28px));
+  height: var(--swatch-size, clamp(20px, 2.5vw, 28px));
+  border: 1px solid rgba(58, 54, 48, 0.15);
   border-radius: 50%;
   padding: 0;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.08);
+  box-shadow: none;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -622,28 +669,26 @@ body {
   color: var(--ink);
 }
 
-#new-pattern-btn {
-  min-height: 44px;
-  padding: 10px 22px;
-  font-family: "Baloo 2", "Nunito", sans-serif;
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--ink);
+.new-pattern-btn {
+  min-height: 40px;
+  padding: 6px 16px;
+  font-family: "Nunito", system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--ink-soft);
   background: #ffffff;
   border: 1px solid var(--card-border);
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.08);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-#new-pattern-btn:hover,
-#new-pattern-btn:focus-visible {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(58, 54, 48, 0.12);
+.new-pattern-btn:hover,
+.new-pattern-btn:focus-visible {
+  color: var(--ink);
+  box-shadow: 0 4px 10px rgba(58, 54, 48, 0.1);
 }
 
-#new-pattern-btn:focus-visible {
+.new-pattern-btn:focus-visible {
   outline: 3px solid var(--ink);
   outline-offset: 2px;
 }

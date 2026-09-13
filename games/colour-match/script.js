@@ -533,49 +533,69 @@ function applyCellSize(container, size, cellPx, gapPx) {
 // real number instead of a viewport-width breakpoint guess, and
 // applies an exact cell size so both grids are guaranteed to fit with
 // no scrollbar and no overlap.
-// The palette is chrome from the grids' point of view — its height
-// eats into the same budget layoutGrids() gives the grids, same as
-// the how-to-play strip or buttons. Sized here (not left at a fixed
-// 44-56px) so a large colour count (up to 6 colours + eraser = 7
-// swatches) doesn't force an oversized two-row palette that starves
-// the grids of space on a tall/large screen. Preference: fit all
-// swatches on one row at MAX_SWATCH_SIZE; if that would need more
-// width than's available, shrink toward MIN_SWATCH_SIZE (still one
-// row) before ever allowing a second row.
-const MAX_SWATCH_SIZE = 56;
-const MIN_SWATCH_SIZE = 36;
+// The palette sits in a vertical column to the RIGHT of the two grids
+// above MOBILE_BREAKPOINT (chrome from the grids' WIDTH budget's point
+// of view), and drops to a horizontal row BELOW the grids on mobile
+// (chrome from the HEIGHT budget's point of view, as it always used to
+// be) — see layoutGrids() and isMobileLayout(). Sized here (not left at
+// a fixed 22-28px) so a large colour count (up to 6 colours + eraser =
+// 7 swatches) doesn't force an oversized palette that starves the
+// grids of space on a small screen. Preference: fit all swatches in one
+// column/row at MAX_SWATCH_SIZE; if that needs more space than's
+// available, shrink toward MIN_SWATCH_SIZE before ever allowing
+// wrapping to a second column/row.
+const MAX_SWATCH_SIZE = 28;
+const MIN_SWATCH_SIZE = 18;
 const SWATCH_GAP = 12;
 
-// Below this much game-area content height, the palette starts
-// scaling down from MAX toward MIN even when it would comfortably fit
-// wider at MAX — a 56px palette is a fixed cost the grid row has to
-// share space with, and on a short phone screen giving the grid a
-// bigger slice matters more than the palette being at its most
-// comfortable size. Chosen as roughly "small phone in portrait";
-// above it the palette just uses MAX_SWATCH_SIZE as before.
-const SHORT_SCREEN_HEIGHT = 700;
+// Fixed breakpoint (not continuous scaling) for switching the palette
+// between a vertical column beside the grids (desktop/tablet) and a
+// horizontal row underneath them (mobile) — chosen deliberately as a
+// hard cutoff, unlike every other measurement in this file, because a
+// vertical palette squeezed next to already-stacked grids on a narrow
+// phone is cramped and harder to tap accurately than one row
+// underneath; there's no meaningful "partially vertical" middle ground
+// to scale through the way cell/swatch SIZE can shrink continuously.
+const MOBILE_BREAKPOINT = 500;
 
-function sizePalette() {
+function isMobileLayout() {
+  return window.innerWidth < MOBILE_BREAKPOINT;
+}
+
+function sizePalette(heightBudget, mobile) {
   const palette = document.getElementById("palette");
   const count = palette.children.length;
   if (count === 0) return;
-  // Measure against #game-area's content box, NOT the palette's own
-  // parent — that wrapper div has no explicit width and shrinks to fit
-  // its content (the palette itself), so reading its width here would
-  // be circular: swatch size would depend on a box that only got its
-  // size FROM the swatches. game-area's box doesn't depend on the
+  // Measure width against #game-area's content box, NOT the palette's
+  // own parent — that wrapper div has no explicit width and shrinks to
+  // fit its content (the palette itself), so reading its width here
+  // would be circular: swatch size would depend on a box that only got
+  // its size FROM the swatches. game-area's box doesn't depend on the
   // palette at all, so it's a stable measurement to size against.
   const gameArea = document.getElementById("game-area");
   const areaRect = gameArea.getBoundingClientRect();
   const areaStyle = getComputedStyle(gameArea);
   const areaPaddingX = (parseFloat(areaStyle.paddingLeft) || 0) + (parseFloat(areaStyle.paddingRight) || 0);
   const widthBudget = areaRect.width - areaPaddingX;
-  const sizeForOneRow = (widthBudget - SWATCH_GAP * (count - 1)) / count;
 
-  const heightScale = Math.max(0, Math.min(1, areaRect.height / SHORT_SCREEN_HEIGHT));
-  const heightScaledMax = MIN_SWATCH_SIZE + (MAX_SWATCH_SIZE - MIN_SWATCH_SIZE) * heightScale;
-
-  const size = Math.max(MIN_SWATCH_SIZE, Math.min(heightScaledMax, sizeForOneRow, MAX_SWATCH_SIZE));
+  let size;
+  if (mobile) {
+    // Horizontal row: swatches share widthBudget, same as the original
+    // below-the-grids layout.
+    const sizeForOneRow = (widthBudget - SWATCH_GAP * (count - 1)) / count;
+    size = Math.max(MIN_SWATCH_SIZE, Math.min(MAX_SWATCH_SIZE, sizeForOneRow));
+  } else {
+    // Vertical column: swatches share heightBudget (the same vertical
+    // space layoutGrids() gives the grids, since the palette sits
+    // beside them, passed in rather than re-measured here). Also
+    // scales toward MIN as available WIDTH narrows, so the grids still
+    // get a fair share of a narrow-but-tall window before the palette
+    // claims its full 28px column width.
+    const sizeForOneColumn = (heightBudget - SWATCH_GAP * (count - 1)) / count;
+    const widthScale = Math.max(0, Math.min(1, widthBudget / (MOBILE_BREAKPOINT * 1.6)));
+    const widthScaledMax = MIN_SWATCH_SIZE + (MAX_SWATCH_SIZE - MIN_SWATCH_SIZE) * widthScale;
+    size = Math.max(MIN_SWATCH_SIZE, Math.min(widthScaledMax, sizeForOneColumn, MAX_SWATCH_SIZE));
+  }
   palette.style.setProperty("--swatch-size", `${Math.floor(size)}px`);
   palette.style.setProperty("--swatch-gap", `${SWATCH_GAP}px`);
 }
@@ -584,8 +604,9 @@ function layoutGrids(isRetry) {
   const size = settings.gridSize;
   const playScreen = document.getElementById("play-screen");
   const gameArea = document.getElementById("game-area");
-  const rowWrap = document.getElementById("game-row-wrap");
+  const playAreaWrap = document.getElementById("play-area-wrap");
   const row = document.getElementById("game-row");
+  const palettePanel = document.querySelector(".palette-panel");
   const targetGrid = document.getElementById("target-grid");
   const playerGrid = document.getElementById("player-grid");
   if (!targetGrid.children.length || !playerGrid.children.length) return;
@@ -603,19 +624,21 @@ function layoutGrids(isRetry) {
   // drop back out of it, not get stuck compact forever.
   if (!isRetry) playScreen.classList.remove("play-screen--compact");
 
-  // Size the palette BEFORE measuring the height budget below — its
-  // height feeds directly into that measurement, so it needs to be at
-  // its final size first (same reasoning as why chrome is measured
-  // live rather than hand-tallied).
-  sizePalette();
+  // Fixed breakpoint, not continuous scaling — see MOBILE_BREAKPOINT.
+  // Below it, `.play-area-wrap--mobile` stacks play-area-wrap's own
+  // children (grid row, then palette) instead of placing them side by
+  // side, so the palette becomes HEIGHT chrome (like the how-to-play
+  // strip) instead of WIDTH chrome.
+  const mobile = isMobileLayout();
+  playAreaWrap.classList.toggle("play-area-wrap--mobile", mobile);
 
-  // How much vertical space is available for game-row-wrap: the
-  // game-area's own height, minus every OTHER direct child of
-  // play-screen (how-to-play strip, palette, status, new-pattern
-  // button) and the gaps between them — measured live via
-  // getBoundingClientRect rather than hand-tallied, so this stays
-  // correct if e.g. the how-to-play strip wraps to two lines on a
-  // narrow screen.
+  // How much vertical space is available for play-area-wrap (the two
+  // grids, plus — on desktop/tablet only — the palette column beside
+  // them): the game-area's own height, minus every OTHER direct child
+  // of play-screen (how-to-play strip, status, new-pattern button) and
+  // the gaps between them — measured live via getBoundingClientRect
+  // rather than hand-tallied, so this stays correct if e.g. the
+  // how-to-play strip wraps to two lines on a narrow screen.
   const areaRect = gameArea.getBoundingClientRect();
   const areaCompStyle = getComputedStyle(gameArea);
   const areaPaddingY =
@@ -624,16 +647,41 @@ function layoutGrids(isRetry) {
 
   let usedHeight = 0;
   for (const child of playScreen.children) {
-    if (child === rowWrap) continue;
+    if (child === playAreaWrap) continue;
     usedHeight += child.getBoundingClientRect().height;
   }
   const screenStyle = getComputedStyle(playScreen);
   const gapCount = playScreen.children.length - 1;
   const screenGap = parseFloat(screenStyle.rowGap || screenStyle.gap || "0") || 0;
   usedHeight += screenGap * Math.max(0, gapCount);
-  const heightBudget = Math.max(0, areaContentHeight - usedHeight);
+  let heightBudget = Math.max(0, areaContentHeight - usedHeight);
 
-  const widthBudget = rowWrap.getBoundingClientRect().width;
+  const wrapStyle = getComputedStyle(playAreaWrap);
+  let widthBudget;
+  if (mobile) {
+    // Stacked: the palette sits BELOW the grid row within
+    // play-area-wrap, so its height (plus the gap between them) comes
+    // out of the height budget instead — same reasoning as every other
+    // piece of chrome above, just inside play-area-wrap instead of
+    // play-screen directly. The grids get the full measured width.
+    sizePalette(heightBudget, true);
+    const wrapGap = parseFloat(wrapStyle.rowGap || wrapStyle.gap || "0") || 0;
+    const paletteHeight = palettePanel.getBoundingClientRect().height;
+    heightBudget = Math.max(0, heightBudget - paletteHeight - wrapGap);
+    widthBudget = playAreaWrap.getBoundingClientRect().width;
+  } else {
+    // Side-by-side: size the palette to the height budget (its
+    // swatches stack in a column beside the grids, sharing the same
+    // vertical space) BEFORE measuring how much width is left for the
+    // grids — the palette's width depends on its now-final swatch
+    // size, and the grids' width budget depends on the palette's
+    // width, same reasoning as why chrome is measured live rather than
+    // hand-tallied.
+    sizePalette(heightBudget, false);
+    const paletteWidth = palettePanel.getBoundingClientRect().width;
+    const wrapGap = parseFloat(wrapStyle.columnGap || wrapStyle.gap || "0") || 0;
+    widthBudget = Math.max(0, playAreaWrap.getBoundingClientRect().width - paletteWidth - wrapGap);
+  }
   const chrome = measurePanelChrome();
 
   // Compute both orientations and prefer side-by-side when it clears
@@ -683,8 +731,8 @@ function layoutGrids(isRetry) {
 
   // Correction pass: the budget above was computed from sibling sizes
   // measured BEFORE this render's DOM changes were applied (e.g. the
-  // palette can gain/lose a row of swatches when colours or picture
-  // mode change, which shifts how tall it renders) — so the applied
+  // palette can gain/lose a swatch when colours or picture mode
+  // change, which shifts how tall its column renders) — so the applied
   // size can occasionally leave game-area still overflowing by a few
   // px once the browser lays out the new DOM. Re-measure after
   // applying and shrink by however many px are over, divided across
@@ -827,7 +875,25 @@ function render() {
   layoutGrids();
 }
 
+// "New pattern" means different things per mode: Random mode already
+// generates a fresh random layout every call (randomPattern() re-rolls
+// each tile), but Picture mode's picturePattern() is deterministic for
+// a given settings.picture/gridSize — calling generateTarget() again
+// would just redraw the exact same picture. So in Picture mode, first
+// switch settings.picture to a different one (any picture but the
+// current one, when more than one exists) before regenerating.
+function pickNewPicture() {
+  const keys = Object.keys(PICTURES);
+  if (keys.length <= 1) return;
+  const others = keys.filter((k) => k !== settings.picture);
+  settings.picture = others[Math.floor(Math.random() * others.length)];
+  saveSettings();
+  renderSettingsPanel();
+  renderMenuDrawer();
+}
+
 function startNewPattern() {
+  if (settings.mode === "picture") pickNewPicture();
   target = generateTarget();
   playerColours = Array(settings.gridSize * settings.gridSize).fill("empty");
   activeColour = null;
