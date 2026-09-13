@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>World Explorer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a id="ls-exit" href="../../index.html" aria-label="Back to home">← Home</a>
+
+  <h1 id="title">World Explorer</h1>
+
+  <div id="place-info" aria-hidden="true"></div>
+
+  <div id="quiz-banner" hidden>
+    <span id="quiz-prompt">Find: <strong id="quiz-target"></strong></span>
+    <button id="quiz-skip-btn" type="button">Skip</button>
+  </div>
+
+  <div id="hint">Drag to spin the globe. Tap a country or ocean to learn its name.</div>
+
+  <div id="feedback" aria-live="polite"></div>
+
+  <canvas id="globe-canvas" aria-label="World globe, drag to look around"></canvas>
+
+  <noscript>This game needs JavaScript and a browser with WebGL support to run.</noscript>
+
+  <div id="controls">
+    <button id="mode-btn" type="button" class="icon-btn" data-tooltip="Play find-it">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="17" cy="17" r="9" stroke="currentColor" stroke-width="1.8" opacity="0.85"/>
+        <path d="M23.5 23.5 L31 31" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
+      </svg>
+    </button>
+    <button id="oceans-btn" type="button" class="icon-btn active" data-tooltip="Show oceans">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M6 22c3-4 6-4 9 0s6 4 9 0 6-4 9 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.85"/>
+        <path d="M6 28c3-4 6-4 9 0s6 4 9 0 6-4 9 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" opacity="0.5"/>
+      </svg>
+    </button>
+    <button id="list-toggle-btn" type="button" class="icon-btn" aria-expanded="false" aria-controls="place-list" data-tooltip="Country list">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="11" cy="13" r="2.2" fill="currentColor" opacity="0.85"/>
+        <circle cx="11" cy="20" r="2.2" fill="currentColor" opacity="0.6"/>
+        <circle cx="11" cy="27" r="2.2" fill="currentColor" opacity="0.35"/>
+        <path d="M17 13 H31M17 20 H31M17 27 H31" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <aside id="place-list-wrap" class="collapsed">
+    <ul id="place-list"></ul>
+  </aside>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>
