@@ -18,7 +18,16 @@ const PADDLE_THICKNESS = 12;
 const PADDLE_HEIGHT_RATIO = 0.18; // relative to table height, so it scales
 const BALL_RADIUS_RATIO = 0.014;
 const BASE_SPEED_RATIO = 0.45; // table-widths per second, horizontal
-const COMPUTER_SPEED_RATIO = 0.34; // table-heights per second the CPU paddle can move
+const COMPUTER_SPEED_RATIO = 0.34; // table-heights per second the CPU paddle can move, at 1x difficulty
+
+// Multipliers on COMPUTER_SPEED_RATIO. "Normal" is the original tuning;
+// Slower/Faster just scale it, so relative feel stays the same across
+// screen sizes exactly like the base ratio does.
+const DIFFICULTIES = [
+  { value: "slower", label: "Slower", multiplier: 0.65 },
+  { value: "normal", label: "Normal", multiplier: 1 },
+  { value: "faster", label: "Faster", multiplier: 1.4 },
+];
 
 const els = {
   scoreBar: document.getElementById("score-bar"),
@@ -37,17 +46,27 @@ const ctx = els.canvas.getContext("2d");
 // ---------- Settings ----------
 
 function defaultSettings() {
-  return { showScore: false };
+  return { showScore: false, difficulty: "normal" };
 }
 
 function loadSettings() {
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
     if (!raw) return defaultSettings();
-    return { ...defaultSettings(), ...JSON.parse(raw) };
+    const parsed = JSON.parse(raw);
+    const base = defaultSettings();
+    if (!DIFFICULTIES.some((d) => d.value === parsed.difficulty)) {
+      parsed.difficulty = base.difficulty;
+    }
+    return { ...base, ...parsed };
   } catch (e) {
     return defaultSettings();
   }
+}
+
+function difficultyMultiplier() {
+  const found = DIFFICULTIES.find((d) => d.value === settings.difficulty);
+  return found ? found.multiplier : 1;
 }
 
 function saveSettings() {
@@ -84,7 +103,15 @@ function sizeCanvas() {
   paddleHeight = H * PADDLE_HEIGHT_RATIO;
   ballRadius = Math.max(6, W * BALL_RADIUS_RATIO);
   baseSpeed = W * BASE_SPEED_RATIO;
-  computerSpeed = H * COMPUTER_SPEED_RATIO;
+  applyDifficulty();
+}
+
+// Recomputes computerSpeed from the table's current size and the selected
+// difficulty. Called on resize (via sizeCanvas) and immediately when the
+// difficulty setting changes, so a mid-game change takes effect on the
+// very next frame rather than waiting for a resize.
+function applyDifficulty() {
+  computerSpeed = H * COMPUTER_SPEED_RATIO * difficultyMultiplier();
 }
 
 // ---------- Game state ----------
@@ -267,6 +294,28 @@ function loop(now) {
   requestAnimationFrame(loop);
 }
 
+// ---------- Difficulty setting ----------
+
+function renderDifficultyToggle() {
+  const container = document.getElementById("difficulty-toggle-options");
+  container.innerHTML = "";
+  DIFFICULTIES.forEach((opt) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "segment";
+    btn.textContent = opt.label;
+    if (opt.value === settings.difficulty) btn.classList.add("segment-active");
+    btn.setAttribute("aria-pressed", String(opt.value === settings.difficulty));
+    btn.addEventListener("click", () => {
+      settings.difficulty = opt.value;
+      saveSettings();
+      applyDifficulty();
+      renderDifficultyToggle();
+    });
+    container.appendChild(btn);
+  });
+}
+
 // ---------- Score visibility setting ----------
 
 function renderScoreToggle() {
@@ -299,6 +348,7 @@ function applyScoreVisibility() {
 // ---------- Menu drawer ----------
 
 function openMenuDrawer() {
+  renderDifficultyToggle();
   renderScoreToggle();
   els.menuDrawer.hidden = false;
   els.menuBackdrop.hidden = false;
