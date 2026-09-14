@@ -1,0 +1,6 @@
+{
+  "title": "Ping Pong",
+  "description": "Rally against a gentle CPU paddle. No timer, no win screen, score optional.",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png"
+}

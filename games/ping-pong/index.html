@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Ping Pong</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a id="ls-exit" href="../../index.html" aria-label="Exit">Exit</a>
+
+  <h1 id="title">Ping Pong</h1>
+
+  <button id="menu-btn" type="button" class="icon-btn" aria-haspopup="true" aria-expanded="false" aria-controls="menu-drawer" data-tooltip="Menu">
+    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="11" cy="13" r="2.2" fill="currentColor" opacity="0.85"/>
+      <circle cx="11" cy="20" r="2.2" fill="currentColor" opacity="0.6"/>
+      <circle cx="11" cy="27" r="2.2" fill="currentColor" opacity="0.35"/>
+      <path d="M17 13 H31M17 20 H31M17 27 H31" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <div id="score-bar" hidden>
+    <span id="score-label-you">You</span>
+    <strong id="score-value-you">0</strong>
+    <span id="score-sep">–</span>
+    <strong id="score-value-cpu">0</strong>
+    <span id="score-label-cpu">CPU</span>
+  </div>
+
+  <main id="board-wrap">
+    <canvas id="board-canvas" aria-label="Ping pong table"></canvas>
+  </main>
+
+  <p id="hint">Move your pointer, or touch and drag, to move your paddle.</p>
+
+  <div id="menu-backdrop" class="menu-backdrop" hidden></div>
+
+  <aside id="menu-drawer" class="menu-drawer" hidden aria-label="Menu">
+    <div class="menu-drawer-header">
+      <h2 class="menu-drawer-title">Menu</h2>
+      <button id="menu-close-btn" type="button" class="menu-close-btn" aria-label="Close menu">✕</button>
+    </div>
+
+    <div class="settings-groups">
+      <div class="settings-row">
+        <span class="settings-row-label" id="score-setting-label">Show score</span>
+        <div class="segmented" role="group" aria-labelledby="score-setting-label" id="score-toggle-options"></div>
+      </div>
+    </div>
+  </aside>
+
+  <script src="script.js"></script>
+</body>
+</html>
