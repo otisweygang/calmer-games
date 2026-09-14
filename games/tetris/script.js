@@ -269,14 +269,31 @@ function resetBoard() {
 
 // ---------- Rendering ----------
 
+// The next-piece panel is fixed-positioned off the board's right edge
+// (see #next-wrap in style.css) rather than sharing a flex row with it,
+// so the board itself always sits at true viewport centre regardless of
+// the panel's width. Below MOBILE_STACK_WIDTH the panel moves under the
+// board instead (CSS media query), so it doesn't need side clearance.
+const MOBILE_STACK_WIDTH = 640;
+const NEXT_PANEL_CLEARANCE = 160; // approx panel width + gap, wide layout only
+
 function sizeCanvases() {
   const availH = window.innerHeight - 120 - 190;
-  const availW = window.innerWidth - 32;
+  const isStacked = window.innerWidth <= MOBILE_STACK_WIDTH;
+  const sideBudget = isStacked ? 16 : NEXT_PANEL_CLEARANCE;
+  // Board must fit within the space left of the panel on *both* sides,
+  // since it's centred - so the usable half-width is bounded by the
+  // tighter of (left edge to centre) and (centre to panel).
+  const availW = 2 * Math.min(window.innerWidth / 2 - 16, window.innerWidth / 2 - sideBudget);
   const cell = Math.max(14, Math.min(Math.floor(availH / ROWS), Math.floor(availW / COLS), 32));
 
   els.boardCanvas.width = cell * COLS;
   els.boardCanvas.height = cell * ROWS;
   els.boardCanvas.dataset.cell = String(cell);
+
+  // Tell #next-wrap exactly how far the board's edge is from centre, so
+  // it offsets from the real board width instead of a guessed constant.
+  document.documentElement.style.setProperty("--board-half-w", `${(cell * COLS) / 2}px`);
 
   const nextCell = Math.max(14, Math.floor(cell * 0.7));
   els.nextCanvas.width = nextCell * 4;

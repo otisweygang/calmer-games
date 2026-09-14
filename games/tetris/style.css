@@ -139,13 +139,15 @@ html, body {
   color: var(--ink);
 }
 
+/* The board is centred on its own - #next-wrap is a separately
+   fixed-positioned panel (below), not a flex sibling here, so adding or
+   resizing the preview never pulls the board off true centre. */
 #board-wrap {
   position: fixed;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 18px;
   padding: 120px 16px 190px;
 }
 
@@ -157,7 +159,13 @@ html, body {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
 }
 
+/* Anchored to the viewport edge rather than beside the board, so it
+   offsets from the centred board without re-centring the pair of them. */
 #next-wrap {
+  position: fixed;
+  top: 50%;
+  left: calc(50% + var(--board-half-w, 170px) + 18px);
+  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -182,12 +190,16 @@ html, body {
 
 @media (max-width: 640px) {
   #board-wrap {
-    flex-direction: column;
-    gap: 10px;
     padding: 100px 12px 210px;
   }
 
+  /* Not enough width for a side panel - sits centred below the board
+     instead, still without affecting the board's own centring. */
   #next-wrap {
+    top: auto;
+    left: 50%;
+    bottom: 190px;
+    transform: translateX(-50%);
     flex-direction: row;
     gap: 10px;
   }
