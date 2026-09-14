@@ -266,22 +266,75 @@
           <title id="whale-title">A whale drifting in deep water, breathing out bubbles</title>
 
           <defs>
+            <!-- Water is warmer and brighter at the surface, cold and
+                 desaturated below, so depth reads without any drawn
+                 horizon line. -->
             <linearGradient id="deep" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#7fc0d4" />
-              <stop offset="35%" stop-color="#4e94b4" />
-              <stop offset="100%" stop-color="#1f4f74" />
+              <stop offset="0%" stop-color="#8fd3e2" />
+              <stop offset="22%" stop-color="#5eaac8" />
+              <stop offset="60%" stop-color="#2f6f9b" />
+              <stop offset="100%" stop-color="#123a5f" />
             </linearGradient>
 
-            <radialGradient id="whaleSkin" cx="40%" cy="25%" r="80%">
-              <stop offset="0%" stop-color="#6f93bd" />
-              <stop offset="55%" stop-color="#4c6f9c" />
-              <stop offset="100%" stop-color="#32507a" />
+            <!-- Haze layered over the far water pushes the distant pod
+                 back and keeps the midground from competing. -->
+            <linearGradient id="waterHaze" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#9fdcea" stop-opacity="0.55" />
+              <stop offset="100%" stop-color="#9fdcea" stop-opacity="0" />
+            </linearGradient>
+
+            <linearGradient id="whaleSkin" x1="0.2" y1="0" x2="0.5" y2="1">
+              <stop offset="0%" stop-color="#4a6f9e" />
+              <stop offset="45%" stop-color="#35547f" />
+              <stop offset="100%" stop-color="#1d3557" />
+            </linearGradient>
+
+            <!-- Light in this scene comes from the surface, so the whale
+                 gets a bright top edge and a dark underside. Without this
+                 the animal reads as a flat sticker on the water. -->
+            <linearGradient id="whaleLight" x1="0.3" y1="0" x2="0.45" y2="1">
+              <stop offset="0%" stop-color="#bfe8fb" stop-opacity="0.42" />
+              <stop offset="34%" stop-color="#bfe8fb" stop-opacity="0.06" />
+              <stop offset="62%" stop-color="#0a1f3a" stop-opacity="0.18" />
+              <stop offset="100%" stop-color="#07162b" stop-opacity="0.6" />
+            </linearGradient>
+
+            <!-- The pale ventral side of a rorqual, fading up into the
+                 dark flank rather than meeting it as a hard edge. -->
+            <!-- The chin is a separate, paler volume: a rorqual's throat
+                 catches light from below and must not merge with the
+                 flank above it. -->
+            <linearGradient id="whaleChin" x1="0.2" y1="0" x2="0.4" y2="1">
+              <stop offset="0%" stop-color="#43648f" />
+              <stop offset="55%" stop-color="#6b8cb4" />
+              <stop offset="100%" stop-color="#9db9d4" />
+            </linearGradient>
+
+            <linearGradient id="whaleBelly" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#cfe6f4" stop-opacity="0" />
+              <stop offset="30%" stop-color="#cfe6f4" stop-opacity="0.18" />
+              <stop offset="62%" stop-color="#dcedf8" stop-opacity="0.62" />
+              <stop offset="100%" stop-color="#eaf5fc" stop-opacity="0.85" />
+            </linearGradient>
+
+            <radialGradient id="whaleShadow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#0a2035" stop-opacity="0.75" />
+              <stop offset="65%" stop-color="#0a2035" stop-opacity="0.3" />
+              <stop offset="100%" stop-color="#0a2035" stop-opacity="0" />
             </radialGradient>
 
-            <radialGradient id="sunShaft" cx="50%" cy="0%" r="70%">
-              <stop offset="0%" stop-color="#d8f2fb" stop-opacity="0.5" />
-              <stop offset="100%" stop-color="#d8f2fb" stop-opacity="0" />
+            <!-- Dappled caustic light from the surface, the same idea as
+                 the frog's speckles: skin that is not one flat fill. -->
+            <radialGradient id="whaleDapple" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#9ad4ef" stop-opacity="0.5" />
+              <stop offset="100%" stop-color="#9ad4ef" stop-opacity="0" />
             </radialGradient>
+
+            <linearGradient id="sunShaft" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#dff6fd" stop-opacity="0.55" />
+              <stop offset="55%" stop-color="#dff6fd" stop-opacity="0.16" />
+              <stop offset="100%" stop-color="#dff6fd" stop-opacity="0" />
+            </linearGradient>
 
             <radialGradient id="bubbleFill" cx="35%" cy="30%" r="65%">
               <stop offset="0%" stop-color="#ffffff" stop-opacity="0.9" />
@@ -289,87 +342,258 @@
               <stop offset="100%" stop-color="#bfe6f5" stop-opacity="0.1" />
             </radialGradient>
 
+            <linearGradient id="kelpBlade" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0%" stop-color="#1d5a52" />
+              <stop offset="100%" stop-color="#3d8f72" />
+            </linearGradient>
+
+            <linearGradient id="seabedFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#1b4a6d" />
+              <stop offset="100%" stop-color="#0c2a45" />
+            </linearGradient>
+
             <!-- Keeps the stretching throat pleats inside the whale's
                  silhouette; without this they spill past the belly as the
                  breath fills and read as loose scribble. -->
             <clipPath id="whaleBodyClip">
-              <path d="M232 308 C240 262 300 238 388 240 C482 242 548 268 566 300 C548 336 476 366 386 368 C298 370 240 350 232 308 Z" />
+              <path d="M196 292 C206 258 246 232 300 224 C356 216 420 226 474 246 C520 263 556 282 578 296 C590 304 592 312 584 320 C560 338 512 354 452 362 C378 372 306 366 258 348 C222 334 200 316 196 300 Z" />
+            </clipPath>
+
+            <!-- Body + chin together. The pale underside is shaded
+                 against this union, so it wraps the whole ventral
+                 surface instead of stopping at the body's edge and
+                 leaving a hard band above the chin. -->
+            <clipPath id="whaleVentralClip">
+              <path d="M196 292 C206 258 246 232 300 224 C356 216 420 226 474 246 C520 263 556 282 578 296 C590 304 592 312 584 320 C560 338 512 354 452 362 C378 372 306 366 258 348 C222 334 200 316 196 300 Z" />
+              <path d="M206 302 C214 330 246 352 298 362 C354 372 418 366 468 348 C436 372 362 382 300 374 C246 367 214 342 204 314 Z" />
+            </clipPath>
+
+            <!-- The jaw is a separate volume so the pleats and the mouth
+                 line can live on it without bleeding onto the flank. -->
+            <clipPath id="whaleJawClip">
+              <path d="M206 302 C214 330 246 352 298 362 C354 372 418 366 468 348 C436 372 362 382 300 374 C246 367 214 342 204 314 Z" />
             </clipPath>
           </defs>
 
-          <rect class="sea" x="-200" y="-400" width="1200" height="1400" fill="url(#deep)" />
+          <g id="background">
+            <rect class="sea" x="-200" y="-400" width="1200" height="1400" fill="url(#deep)" />
+            <rect class="sea-haze" x="-200" y="-400" width="1200" height="820" fill="url(#waterHaze)" />
 
-          <!-- Light shafts from the surface, drifting with the breath. -->
-          <g class="light-shafts">
-            <polygon points="180,-40 250,-40 400,520 250,520" fill="url(#sunShaft)" />
-            <polygon points="470,-40 520,-40 640,520 540,520" fill="url(#sunShaft)" />
-            <polygon points="30,-40 70,-40 150,520 60,520" fill="url(#sunShaft)" />
+            <!-- Light shafts from the surface, drifting with the breath.
+                 Angled and unequal so they read as light through moving
+                 water rather than as stripes. -->
+            <g class="light-shafts">
+              <polygon points="150,-60 226,-60 356,540 236,540" fill="url(#sunShaft)" />
+              <polygon points="452,-60 506,-60 612,540 520,540" fill="url(#sunShaft)" />
+              <polygon points="18,-60 58,-60 140,540 44,540" fill="url(#sunShaft)" />
+              <polygon points="654,-60 690,-60 760,540 684,540" fill="url(#sunShaft)" />
+            </g>
           </g>
 
-          <!-- Far silhouettes: a distant pod, barely visible. -->
-          <g class="layer-far" opacity="0.16">
-            <ellipse cx="120" cy="150" rx="52" ry="16" fill="#123a5c" />
-            <ellipse cx="690" cy="196" rx="40" ry="12" fill="#123a5c" />
-          </g>
-
-          <!-- Plankton motes the breath pushes around. -->
-          <g class="drift-layer" id="drift-layer-whale" aria-hidden="true"></g>
-
-          <!-- Bubbles rise from the blowhole on each exhale. -->
-          <g class="mist-layer" id="mist-layer-whale" aria-hidden="true"></g>
-
-          <!-- Kelp, anchored to the seabed, swaying away on the exhale. -->
-          <g class="kelp-layer" aria-hidden="true">
-            <path style="--lean: -1" d="M60 500 C40 420 70 360 50 300" />
-            <path style="--lean: -1" d="M104 500 C86 430 112 372 96 316" />
-            <path style="--lean: -1" d="M150 500 C136 440 158 392 148 344" />
-            <path style="--lean: 1" d="M742 500 C762 420 732 358 752 298" />
-            <path style="--lean: 1" d="M700 500 C716 432 692 374 706 314" />
-            <path style="--lean: 1" d="M654 500 C668 442 646 394 656 346" />
-          </g>
-
-          <g class="whale" id="whale">
-            <!-- Tail: sweeps slowly with the breath. -->
-            <g class="whale-tail">
-              <path class="whale-tail-shape" d="M556 318 C596 300 634 286 664 276 C650 300 648 322 656 344 C630 336 592 330 558 334 Z" />
+          <g id="environment">
+            <!-- Far silhouettes: a distant pod, barely visible. Drawn as
+                 whale shapes rather than ellipses, so the depth cue is an
+                 animal and not a smudge. -->
+            <g class="layer-far">
+              <path d="M96 160 C112 149 140 145 166 150 C186 154 200 160 206 165 C196 172 168 177 140 176 C118 175 102 169 94 164 Z" />
+              <path d="M206 165 C214 160 222 155 231 151 C228 157 227 161 228 165 C227 169 228 173 231 179 C222 175 213 170 206 165 Z" />
+              <path d="M660 212 C672 204 692 201 710 205 C723 208 732 213 736 216 C729 221 710 225 691 224 C675 223 664 219 658 216 Z" />
+              <path d="M736 216 C742 213 748 210 754 207 C752 212 751 215 752 218 C751 221 752 224 754 228 C748 225 741 220 736 216 Z" />
             </g>
 
-            <!-- Pectoral fin, behind the body. -->
-            <ellipse class="whale-fin" cx="372" cy="344" rx="42" ry="16" />
+            <!-- A shoal, far off and small: it gives the midwater a scale
+                 reference without adding clutter near the whale. -->
+            <g class="shoal">
+              <path d="M120 322 l9 -3 -3 3 3 3 z" />
+              <path d="M138 314 l9 -3 -3 3 3 3 z" />
+              <path d="M132 332 l9 -3 -3 3 3 3 z" />
+              <path d="M154 326 l9 -3 -3 3 3 3 z" />
+              <path d="M148 342 l9 -3 -3 3 3 3 z" />
+              <path d="M168 336 l9 -3 -3 3 3 3 z" />
+              <path d="M110 338 l9 -3 -3 3 3 3 z" />
+            </g>
 
-            <!-- Tapered body: a plain ellipse read as a floating pill, so
-                 the silhouette narrows toward the tail and rounds at the
-                 head the way a real rorqual does. -->
-            <path class="whale-body" d="M232 308 C240 262 300 238 388 240 C482 242 548 268 566 300 C548 336 476 366 386 368 C298 370 240 350 232 308 Z" fill="url(#whaleSkin)" />
+            <!-- Plankton motes the breath pushes around. -->
+            <g class="drift-layer" id="drift-layer-whale" aria-hidden="true"></g>
 
-            <!-- Underside and pleats both clipped to the silhouette. -->
-            <g clip-path="url(#whaleBodyClip)">
-              <path class="whale-belly" d="M244 320 C300 366 470 370 556 306 C512 364 300 372 244 320 Z" />
+            <!-- Bubbles rise from the blowhole on each exhale. -->
+            <g class="mist-layer" id="mist-layer-whale" aria-hidden="true"></g>
+          </g>
 
-              <!-- Throat pleats: a real rorqual's grooves stretch open as
-                   it fills. Scaling these rather than the whole animal is
-                   the breath cue — the body never changes size. -->
-              <g class="whale-pleats" id="whale-pleats">
-                <path d="M258 318 C288 344 318 352 342 350" />
-                <path d="M284 328 C312 354 342 362 366 360" />
-                <path d="M310 334 C336 360 366 368 390 366" />
-                <path d="M336 338 C362 362 390 370 414 368" />
+          <g id="character">
+            <!-- Shadow cast down into the deep. The frog gets a reflection
+                 for the same reason: without it the animal floats on the
+                 background instead of sitting in the scene. -->
+            <ellipse class="whale-shadow" cx="392" cy="446" rx="186" ry="30" aria-hidden="true" />
+
+            <g class="whale" id="whale">
+              <!-- Peduncle and flukes as one continuous taper: the wrist
+                   narrows out of the body and the flukes spread from it,
+                   so the tail is part of the animal, not an arrowhead
+                   parked behind it. -->
+              <g class="whale-tail">
+                <path class="whale-peduncle" d="M548 288 C592 288 634 296 668 310 C636 330 594 340 548 340 C556 322 558 306 548 288 Z" />
+                <path class="whale-fluke" d="M660 310 C682 288 712 266 744 252 C756 248 762 254 756 264 C740 284 726 300 720 312 C726 326 740 342 756 362 C762 372 756 378 744 374 C710 360 680 336 658 314 Z" />
+                <path class="whale-fluke-shade" d="M660 310 C682 288 712 266 744 252 C756 248 762 254 756 264 C740 284 726 300 720 312 C700 314 678 313 658 312 Z" />
+              </g>
+
+              <!-- Far flipper, behind the body: a second limb is what
+                   stops the whale reading as a flat cut-out. -->
+              <path class="whale-flipper whale-flipper--far" d="M366 318 C380 342 392 368 398 392 C400 402 394 408 386 404 C370 388 352 358 344 330 Z" />
+
+              <!-- Body: deep chest under a rounded rostrum, tapering back
+                   to the wrist. The old outline was a symmetrical almond
+                   with no jaw, which is what made it read as a blimp. -->
+              <path class="whale-body" d="M196 292 C206 258 246 232 300 224 C356 216 420 226 474 246 C520 263 556 282 578 296 C590 304 592 312 584 320 C560 338 512 354 452 362 C378 372 306 366 258 348 C222 334 200 316 196 300 Z" fill="url(#whaleSkin)" />
+
+              <!-- Everything that gives the skin its surface is clipped to
+                   the silhouette: mottling, caustics, and the surface light.
+                   The frog has speckles for the same reason — a single flat
+                   fill reads as plastic. -->
+              <g clip-path="url(#whaleBodyClip)">
+
+                <!-- Mottled grey patches, the way a real humpback's flank is
+                     never one tone. -->
+                <g class="whale-mottle" aria-hidden="true">
+                  <ellipse cx="352" cy="256" rx="52" ry="18" transform="rotate(-9 352 256)" />
+                  <ellipse cx="462" cy="276" rx="44" ry="15" transform="rotate(-6 462 276)" />
+                  <ellipse cx="286" cy="268" rx="32" ry="13" transform="rotate(-14 286 268)" />
+                  <ellipse cx="528" cy="296" rx="30" ry="11" transform="rotate(-4 528 296)" />
+                  <ellipse cx="402" cy="240" rx="34" ry="11" transform="rotate(-10 402 240)" />
+                </g>
+
+                <!-- Pale scarring along the flank — the detail that makes a
+                     whale look like an animal that has lived somewhere. -->
+                <g class="whale-scars" aria-hidden="true">
+                  <path d="M376 292 C394 287 412 287 430 292" />
+                  <path d="M444 306 C460 302 476 302 490 306" />
+                  <path d="M322 286 C336 282 350 282 362 285" />
+                  <path d="M400 318 C416 314 432 314 446 318" />
+                </g>
+
+                <!-- Caustic light pooling on the back. -->
+                <g class="whale-dapples" aria-hidden="true">
+                  <ellipse cx="336" cy="248" rx="40" ry="14" fill="url(#whaleDapple)" />
+                  <ellipse cx="460" cy="266" rx="46" ry="15" fill="url(#whaleDapple)" />
+                  <ellipse cx="264" cy="266" rx="28" ry="11" fill="url(#whaleDapple)" />
+                  <ellipse cx="548" cy="292" rx="30" ry="10" fill="url(#whaleDapple)" />
+                </g>
+
+                <!-- Surface light over everything: bright back, dark belly. -->
+                <path class="whale-shade" d="M196 292 C206 258 246 232 300 224 C356 216 420 226 474 246 C520 263 556 282 578 296 C590 304 592 312 584 320 C560 338 512 354 452 362 C378 372 306 366 258 348 C222 334 200 316 196 300 Z" fill="url(#whaleLight)" />
+              </g>
+
+              <!-- Lower jaw: the big scalloped chin of a rorqual, drawn
+                   as its own lit volume. This is the line that makes the
+                   head read as a head. -->
+              <path class="whale-jaw" d="M206 302 C214 330 246 352 298 362 C354 372 418 366 468 348 C436 372 362 382 300 374 C246 367 214 342 204 314 Z" fill="url(#whaleChin)" />
+              <!-- Only the chin's LOWER profile is stroked, as an open
+                   path that fades out into the flank. Stroking the whole
+                   closed loop drew a hard line through the belly and
+                   ended the chin in a blunt stub. -->
+              <path class="whale-jaw-edge" d="M204 314 C214 342 246 367 300 374 C362 382 436 372 468 348" />
+
+              <g clip-path="url(#whaleJawClip)">
+                <!-- Throat pleats: a real rorqual's grooves stretch open
+                     as it fills. Scaling these rather than the whole
+                     animal is the breath cue — the body never changes
+                     size. -->
+                <path class="whale-jaw-shade" d="M202 300 C210 334 246 358 300 368 C360 379 428 370 478 350 C438 378 362 388 298 380 C242 373 208 346 200 308 Z" />
+              </g>
+
+              <!-- One ventral pass over body and chin together, so the
+                   pale underside reads as a single continuous surface. -->
+              <g clip-path="url(#whaleVentralClip)">
+                <path class="whale-belly" d="M190 286 C238 344 420 370 596 288 L596 420 L190 420 Z" fill="url(#whaleBelly)" />
+              </g>
+
+              <!-- Throat grooves sit above the ventral pass: they are
+                   the breath cue and must stay readable. -->
+              <g clip-path="url(#whaleJawClip)">
+                <g class="whale-pleats" id="whale-pleats">
+                  <path d="M238 338 C234 344 233 348 236 352" />
+                  <path d="M262 352 C258 358 257 363 260 368" />
+                  <path d="M288 361 C284 369 283 374 286 380" />
+                  <path d="M314 367 C310 374 309 380 312 385" />
+                  <path d="M340 370 C336 377 335 382 338 387" />
+                  <path d="M366 371 C362 377 361 382 364 387" />
+                  <path d="M392 369 C388 375 387 380 390 384" />
+                  <path d="M418 365 C414 370 413 374 416 378" />
+                </g>
+              </g>
+
+              <!-- Dorsal fin, set two-thirds back the way a humpback's is,
+                   with a falcate trailing edge. -->
+              <path class="whale-dorsal" d="M468 244 C486 220 506 212 518 216 C510 228 504 242 504 260 C492 252 480 247 468 244 Z" />
+
+              <!-- Knobbly tubercles along the rostrum — the detail that
+                   signals "humpback" more than any amount of shading. -->
+              <g class="whale-knobs" aria-hidden="true">
+                <circle cx="228" cy="262" r="3.4" />
+                <circle cx="254" cy="248" r="3.2" />
+                <circle cx="284" cy="238" r="3" />
+                <circle cx="316" cy="232" r="2.8" />
+                <circle cx="222" cy="282" r="3" />
+                <circle cx="248" cy="270" r="2.8" />
+              </g>
+
+              <path class="whale-ridge" d="M318 226 C392 226 486 250 560 288" />
+
+              <ellipse class="whale-eye" cx="246" cy="300" rx="7" ry="7.5" />
+              <circle class="whale-eye-shine" cx="244" cy="297" r="2.4" />
+              <path class="whale-eye-crease" d="M232 288 C240 284 252 284 260 288" />
+
+              <!-- Mouth line runs back from the snout along the jaw. -->
+              <path class="whale-mouth" d="M196 302 C232 336 294 360 366 368" />
+
+              <!-- Blowhole: where the bubbles are emitted. Sits at the
+                   emitter's anchor (336, 236). -->
+              <g class="whale-blowhole">
+                <ellipse cx="330" cy="237" rx="6.5" ry="4.5" transform="rotate(-14 330 237)" />
+                <ellipse cx="343" cy="239" rx="6.5" ry="4.5" transform="rotate(-14 343 239)" />
+              </g>
+
+              <!-- Near flipper, in front of the body and lit from above,
+                   so it overlaps the flank and gives the animal depth. -->
+              <path class="whale-flipper" d="M318 322 C336 352 356 384 366 414 C370 426 362 434 350 428 C326 408 302 370 292 336 Z" />
+              <path class="whale-flipper-shade" d="M318 322 C336 352 356 384 366 414 C368 422 366 427 361 429 C356 398 340 356 312 326 Z" />
+
+            </g>
+          </g>
+
+          <g id="foreground">
+            <!-- Seabed, with kelp anchored into it. Drawn as a soft ridge
+                 rather than a flat ellipse so the floor has a contour. -->
+            <path class="seabed" d="M-200 470 C-40 448 90 458 220 470 C360 483 520 476 660 462 C760 452 860 456 1000 470 L1000 560 L-200 560 Z" fill="url(#seabedFill)" />
+
+            <!-- Kelp, anchored to the seabed, swaying away on the exhale.
+                 Tapered blades rather than uniform strokes. -->
+            <g class="kelp-layer" aria-hidden="true">
+              <g style="--lean: -1">
+                <path class="kelp-blade" d="M58 500 C40 424 66 366 46 300 C58 296 68 300 72 308 C86 372 66 428 78 500 Z" />
+              </g>
+              <g style="--lean: -1">
+                <path class="kelp-blade" d="M108 500 C92 432 116 376 100 318 C112 314 122 318 126 326 C138 382 120 436 130 500 Z" />
+              </g>
+              <g style="--lean: -1">
+                <path class="kelp-blade" d="M156 500 C144 444 164 398 154 350 C164 346 172 350 176 357 C186 402 170 448 178 500 Z" />
+              </g>
+              <g style="--lean: 1">
+                <path class="kelp-blade" d="M744 500 C762 424 736 362 756 296 C744 292 734 296 730 304 C716 370 736 428 724 500 Z" />
+              </g>
+              <g style="--lean: 1">
+                <path class="kelp-blade" d="M696 500 C712 432 688 374 704 314 C692 310 682 314 678 322 C666 380 684 436 674 500 Z" />
+              </g>
+              <g style="--lean: 1">
+                <path class="kelp-blade" d="M646 500 C658 442 638 396 648 348 C638 344 630 348 626 355 C616 400 632 446 624 500 Z" />
               </g>
             </g>
 
-            <!-- Dorsal ridge, for a little form on an otherwise flat back. -->
-            <path class="whale-ridge" d="M300 250 C360 240 448 248 520 272" />
-
-            <ellipse class="whale-eye" cx="286" cy="296" rx="7" ry="8" />
-            <circle class="whale-eye-shine" cx="284" cy="293" r="2.4" />
-            <path class="whale-mouth" d="M234 314 C266 332 306 340 344 338" />
-
-            <!-- Blowhole: where the bubbles are emitted. -->
-            <ellipse class="whale-blowhole" cx="336" cy="244" rx="10" ry="5" />
+            <!-- Out-of-focus rock in the near corner, to frame the
+                 composition and hold the bottom-left. -->
+            <path class="reef-near" d="M-40 500 C10 452 70 440 118 462 C150 476 168 490 180 500 Z" />
+            <path class="reef-near reef-near--right" d="M840 500 C790 446 720 442 676 468 C650 484 636 492 626 500 Z" />
           </g>
-
-          <!-- Seabed in the foreground. -->
-          <ellipse class="seabed" cx="400" cy="520" rx="620" ry="70" fill="#17405f" opacity="0.55" />
         </svg>
 
         <!-- ============ SNOW / FOX ============
@@ -390,25 +614,73 @@
 
           <defs>
             <linearGradient id="nightSky" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#2b3b63" />
-              <stop offset="55%" stop-color="#4a5c86" />
-              <stop offset="100%" stop-color="#8496b4" />
+              <stop offset="0%" stop-color="#1b2547" />
+              <stop offset="40%" stop-color="#33406c" />
+              <stop offset="72%" stop-color="#5a6a94" />
+              <stop offset="100%" stop-color="#93a4c2" />
             </linearGradient>
 
+            <!-- Snow takes the sky's colour, cooler in the distance and
+                 warmer where the moon strikes it near the fox. -->
             <linearGradient id="snowField" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#dfe7f2" />
-              <stop offset="100%" stop-color="#aeb9d0" />
+              <stop offset="0%" stop-color="#b9c6de" />
+              <stop offset="35%" stop-color="#dae3f1" />
+              <stop offset="100%" stop-color="#eef3fa" />
             </linearGradient>
 
-            <radialGradient id="foxFur" cx="40%" cy="28%" r="78%">
-              <stop offset="0%" stop-color="#e0854a" />
-              <stop offset="55%" stop-color="#c96a35" />
-              <stop offset="100%" stop-color="#a5502a" />
-            </radialGradient>
+            <linearGradient id="snowNear" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#f2f6fc" />
+              <stop offset="100%" stop-color="#c9d5e8" />
+            </linearGradient>
+
+            <!-- A fox's coat is rust over the back, fading to a warmer
+                 amber on the flank. A flat radial made it read as one
+                 moulded lump. -->
+            <linearGradient id="foxFur" x1="0.3" y1="0" x2="0.5" y2="1">
+              <stop offset="0%" stop-color="#e28b4a" />
+              <stop offset="42%" stop-color="#c8672f" />
+              <stop offset="100%" stop-color="#8f421f" />
+            </linearGradient>
+
+            <linearGradient id="foxFurHead" x1="0.25" y1="0" x2="0.6" y2="1">
+              <stop offset="0%" stop-color="#e8975a" />
+              <stop offset="50%" stop-color="#cd6f37" />
+              <stop offset="100%" stop-color="#9c4a26" />
+            </linearGradient>
+
+            <linearGradient id="foxTailFur" x1="0.2" y1="0" x2="0.7" y2="1">
+              <stop offset="0%" stop-color="#d97f42" />
+              <stop offset="55%" stop-color="#b85c2c" />
+              <stop offset="100%" stop-color="#7d3a1b" />
+            </linearGradient>
+
+            <!-- The moon is up and to the right, so the fox takes a cool
+                 rim along its back and a warm shadow underneath. The old
+                 version ignored its own light source entirely. -->
+            <linearGradient id="foxMoon" x1="0.1" y1="1" x2="0.9" y2="0">
+              <stop offset="0%" stop-color="#1e2a4d" stop-opacity="0.55" />
+              <stop offset="50%" stop-color="#1e2a4d" stop-opacity="0.04" />
+              <stop offset="82%" stop-color="#dbe6ff" stop-opacity="0.3" />
+              <stop offset="100%" stop-color="#eef4ff" stop-opacity="0.55" />
+            </linearGradient>
+
+            <!-- Keeps fur strokes inside the body silhouette. -->
+            <clipPath id="foxBodyClip">
+              <path d="M262 404 C256 372 278 344 316 330 C356 315 404 316 444 330 C486 344 512 366 520 392 C524 408 518 420 502 426 C446 440 320 440 288 428 C270 421 262 414 262 404 Z" />
+            </clipPath>
+
+            <clipPath id="foxTailClip">
+              <path d="M486 384 C528 372 568 374 592 394 C620 416 614 448 584 456 C558 463 534 452 530 434 C552 438 568 431 568 417 C568 397 538 388 490 400 Z" />
+            </clipPath>
+
+            <clipPath id="foxHeadClip">
+              <path d="M318 298 C320 272 344 256 376 256 C408 256 430 274 434 302 C438 328 428 350 408 362 C388 374 360 376 338 368 C328 365 318 358 310 350 C300 354 286 360 272 366 C258 372 246 368 241 358 C236 347 242 337 254 333 C270 328 288 324 302 322 C306 313 311 304 318 298 Z" />
+            </clipPath>
 
             <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="#f4f7ff" stop-opacity="0.8" />
-              <stop offset="100%" stop-color="#f4f7ff" stop-opacity="0" />
+              <stop offset="0%" stop-color="#f4f7ff" stop-opacity="0.85" />
+              <stop offset="45%" stop-color="#dce8ff" stop-opacity="0.25" />
+              <stop offset="100%" stop-color="#dce8ff" stop-opacity="0" />
             </radialGradient>
 
             <radialGradient id="frostPuff" cx="50%" cy="50%" r="50%">
@@ -416,92 +688,244 @@
               <stop offset="55%" stop-color="#dce8fb" stop-opacity="0.45" />
               <stop offset="100%" stop-color="#c6d8f5" stop-opacity="0" />
             </radialGradient>
+
+            <!-- One reusable conifer, instanced at different scales for
+                 the treeline. Cheaper than redrawing every tree, and it
+                 keeps the forest visually consistent. -->
+            <g id="pine">
+              <path d="M0 0 L0 -84" stroke="#16233f" stroke-width="5" stroke-linecap="round" />
+              <path d="M0 -78 C10 -58 17 -44 22 -34 C12 -38 6 -40 0 -41 C-6 -40 -12 -38 -22 -34 C-17 -44 -10 -58 0 -78 Z" fill="#1d2d4e" />
+              <path d="M0 -54 C12 -32 20 -17 26 -6 C14 -11 6 -13 0 -14 C-6 -13 -14 -11 -26 -6 C-20 -17 -12 -32 0 -54 Z" fill="#1d2d4e" />
+              <path d="M0 -30 C14 -6 23 10 30 22 C16 16 7 14 0 13 C-7 14 -16 16 -30 22 C-23 10 -14 -6 0 -30 Z" fill="#1d2d4e" />
+            </g>
           </defs>
 
-          <rect class="night" x="-200" y="-400" width="1200" height="800" fill="url(#nightSky)" />
+          <g id="background">
+            <rect class="night" x="-200" y="-400" width="1200" height="800" fill="url(#nightSky)" />
 
-          <!-- Stars. Static: twinkling would compete with the breath. -->
-          <g class="stars" aria-hidden="true">
-            <circle cx="90" cy="58" r="1.8" /><circle cx="168" cy="120" r="1.3" />
-            <circle cx="246" cy="46" r="1.6" /><circle cx="330" cy="104" r="1.2" />
-            <circle cx="470" cy="62" r="1.7" /><circle cx="556" cy="132" r="1.3" />
-            <circle cx="646" cy="52" r="1.5" /><circle cx="726" cy="112" r="1.8" />
-            <circle cx="404" cy="30" r="1.3" /><circle cx="612" cy="196" r="1.2" />
-            <circle cx="120" cy="186" r="1.2" /><circle cx="760" cy="176" r="1.4" />
-          </g>
-
-          <circle class="moon-glow" cx="654" cy="96" r="120" fill="url(#moonGlow)" />
-          <circle class="moon" cx="654" cy="96" r="34" fill="#f6f8ff" />
-          <circle cx="666" cy="86" r="7" fill="#e2e8f5" opacity="0.7" />
-          <circle cx="644" cy="108" r="5" fill="#e2e8f5" opacity="0.55" />
-
-          <!-- Distant treeline. -->
-          <g class="layer-far" opacity="0.5">
-            <path d="M-20 300 L40 196 L100 300 Z" fill="#2c3c5e" />
-            <path d="M60 300 L128 172 L196 300 Z" fill="#33456a" />
-            <path d="M168 300 L226 204 L284 300 Z" fill="#2c3c5e" />
-            <path d="M520 300 L580 188 L640 300 Z" fill="#2c3c5e" />
-            <path d="M612 300 L684 164 L756 300 Z" fill="#33456a" />
-            <path d="M726 300 L790 200 L854 300 Z" fill="#2c3c5e" />
-          </g>
-
-          <!-- Snow field. -->
-          <path class="snow-field" d="M-200 300 C120 276 300 292 420 286 C560 280 700 296 1000 286 L1000 900 L-200 900 Z" fill="url(#snowField)" />
-
-          <!-- Falling snow the breath pushes sideways. -->
-          <g class="drift-layer" id="drift-layer-fox" aria-hidden="true"></g>
-
-          <!-- Frost breath from the muzzle. -->
-          <g class="mist-layer" id="mist-layer-fox" aria-hidden="true"></g>
-
-          <!-- Pine boughs that bend away on the exhale. -->
-          <g class="bough-layer" aria-hidden="true">
-            <path style="--lean: -1" d="M40 500 C34 424 62 380 46 330" />
-            <path style="--lean: -1" d="M96 500 C88 438 110 398 98 356" />
-            <path style="--lean: 1" d="M756 500 C764 420 736 378 754 328" />
-            <path style="--lean: 1" d="M702 500 C710 440 688 398 700 354" />
-          </g>
-
-          <g class="fox" id="fox">
-            <!-- Shadow on the snow. -->
-            <ellipse cx="400" cy="424" rx="150" ry="26" fill="#7f8cab" opacity="0.4" />
-
-            <!-- Tail curls around the front, the way a resting fox lies. -->
-            <path class="fox-tail" d="M486 400 C580 408 610 356 576 322 C560 366 520 378 484 372 Z" />
-            <path class="fox-tail-tip" d="M576 322 C598 340 596 372 570 386 C588 366 588 340 576 322 Z" />
-
-            <ellipse class="fox-body" cx="400" cy="374" rx="126" ry="56" fill="url(#foxFur)" />
-            <path class="fox-chest" d="M300 396 C340 418 452 420 496 396 C452 428 342 428 300 396 Z" />
-
-            <g class="fox-head" id="fox-head">
-              <!-- Ears. -->
-              <path class="fox-ear" d="M268 292 L286 230 L318 276 Z" />
-              <path class="fox-ear-inner" d="M280 288 L290 252 L306 280 Z" />
-              <path class="fox-ear" d="M382 286 L378 226 L344 272 Z" />
-              <path class="fox-ear-inner" d="M372 282 L370 250 L354 276 Z" />
-
-              <ellipse class="fox-skull" cx="324" cy="318" rx="66" ry="52" fill="url(#foxFur)" />
-
-              <!-- Pale cheek ruff, tucked against the jaw rather than
-                   floating as a separate blob over the face. -->
-              <path class="fox-cheek" d="M300 344 C286 372 320 386 356 378 C382 372 388 350 378 336 C356 352 324 352 300 344 Z" />
-
-              <!-- Muzzle: pale, tapering forward from the skull, and
-                   where the frost-breath comes from. -->
-              <path class="fox-muzzle" d="M290 332 C258 334 228 346 218 358 C230 372 258 378 288 372 C306 366 310 342 290 332 Z" />
-
-              <ellipse class="fox-eye" cx="306" cy="306" rx="7.5" ry="8.5" />
-              <ellipse class="fox-eye" cx="360" cy="304" rx="7.5" ry="8.5" />
-              <circle class="fox-eye-shine" cx="304" cy="303" r="2.6" />
-              <circle class="fox-eye-shine" cx="358" cy="301" r="2.6" />
-
-              <ellipse class="fox-nose" cx="220" cy="357" rx="9" ry="7.5" />
+            <!-- Stars. Static: twinkling would compete with the breath. -->
+            <g class="stars" aria-hidden="true">
+              <circle cx="90" cy="58" r="1.8" /><circle cx="168" cy="120" r="1.3" />
+              <circle cx="246" cy="46" r="1.6" /><circle cx="330" cy="104" r="1.2" />
+              <circle cx="470" cy="62" r="1.7" /><circle cx="556" cy="132" r="1.3" />
+              <circle cx="646" cy="52" r="1.5" /><circle cx="726" cy="112" r="1.8" />
+              <circle cx="404" cy="30" r="1.3" /><circle cx="612" cy="196" r="1.2" />
+              <circle cx="120" cy="186" r="1.2" /><circle cx="760" cy="176" r="1.4" />
+              <circle cx="52" cy="132" r="1.1" /><circle cx="296" cy="166" r="1.1" />
+              <circle cx="512" cy="28" r="1.2" /><circle cx="700" cy="240" r="1.1" />
             </g>
+
+            <circle class="moon-glow" cx="654" cy="96" r="132" fill="url(#moonGlow)" />
+            <circle class="moon" cx="654" cy="96" r="34" fill="#f6f8ff" />
+            <circle cx="666" cy="86" r="7" fill="#e2e8f5" opacity="0.55" />
+            <circle cx="644" cy="108" r="5" fill="#e2e8f5" opacity="0.4" />
+            <circle cx="660" cy="112" r="3.2" fill="#e2e8f5" opacity="0.35" />
           </g>
 
-          <!-- Foreground snow bank. -->
-          <ellipse cx="120" cy="512" rx="230" ry="48" fill="#c6d0e3" opacity="0.6" />
-          <ellipse cx="700" cy="520" rx="250" ry="52" fill="#c6d0e3" opacity="0.55" />
+          <g id="environment">
+            <!-- Distant ridge behind the treeline: the layer that gives
+                 the horizon depth instead of a flat band of sky. -->
+            <path class="far-ridge" d="M-200 306 C-60 268 40 258 150 272 C250 284 330 262 430 258 C540 254 640 272 760 262 C860 254 940 262 1000 272 L1000 340 L-200 340 Z" />
+
+            <!-- Treeline, instanced from one conifer so the forest reads
+                 as a forest rather than a row of triangles. -->
+            <g class="treeline treeline--far">
+              <use href="#pine" x="36" y="300" transform="translate(36 300) scale(0.62) translate(-36 -300)" />
+              <use href="#pine" x="96" y="306" transform="translate(96 306) scale(0.5) translate(-96 -306)" />
+              <use href="#pine" x="150" y="302" transform="translate(150 302) scale(0.72) translate(-150 -302)" />
+              <use href="#pine" x="212" y="308" transform="translate(212 308) scale(0.55) translate(-212 -308)" />
+              <use href="#pine" x="268" y="304" transform="translate(268 304) scale(0.66) translate(-268 -304)" />
+              <use href="#pine" x="330" y="308" transform="translate(330 308) scale(0.46) translate(-330 -308)" />
+              <use href="#pine" x="470" y="306" transform="translate(470 306) scale(0.52) translate(-470 -306)" />
+              <use href="#pine" x="524" y="302" transform="translate(524 302) scale(0.7) translate(-524 -302)" />
+              <use href="#pine" x="586" y="308" transform="translate(586 308) scale(0.48) translate(-586 -308)" />
+              <use href="#pine" x="640" y="304" transform="translate(640 304) scale(0.64) translate(-640 -304)" />
+              <use href="#pine" x="706" y="308" transform="translate(706 308) scale(0.54) translate(-706 -308)" />
+              <use href="#pine" x="764" y="302" transform="translate(764 302) scale(0.68) translate(-764 -302)" />
+            </g>
+
+            <!-- Snow field. A soft rise behind the fox seats it in the
+                 landscape instead of on a flat plane. -->
+            <path class="snow-field" d="M-200 316 C-40 300 80 306 220 312 C340 317 420 300 520 300 C640 300 760 312 1000 306 L1000 900 L-200 900 Z" fill="url(#snowField)" />
+            <path class="snow-rise" d="M180 344 C260 322 360 318 452 330 C540 341 604 352 660 366 C520 372 300 370 180 360 Z" />
+
+            <!-- Falling snow the breath pushes sideways. -->
+            <g class="drift-layer" id="drift-layer-fox" aria-hidden="true"></g>
+          </g>
+
+          <g id="character">
+            <!-- The fox sits IN the snow: a soft hollow of shadow under
+                 the body, then a lip of snow banked up against it. The
+                 old version was one flat disc, which read as a sticker
+                 dropped on the field. -->
+            <ellipse class="fox-hollow" cx="396" cy="432" rx="168" ry="30" />
+            <ellipse class="fox-contact" cx="392" cy="436" rx="116" ry="16" />
+
+            <g class="fox" id="fox">
+              <!-- Brush tail, sweeping around the front of the body and
+                   curling back toward the nose the way a resting fox
+                   wraps itself. It is as thick as the body at the root
+                   and tapers only near the tip. -->
+
+              <!-- Brush tail, swept out onto open snow off the rump.
+                   Drawn BEFORE the body so the curl overlaps its root —
+                   that overlap is what attaches it to the animal. Inside
+                   the silhouette it had nothing to read against. -->
+              <g class="fox-tail-group">
+                <path class="fox-tail" d="M486 384 C528 372 568 374 592 394 C620 416 614 448 584 456 C558 463 534 452 530 434 C552 438 568 431 568 417 C568 397 538 388 490 400 Z" />
+                <g clip-path="url(#foxTailClip)" aria-hidden="true">
+                  <g class="fox-fur fox-fur--tail">
+                    <path d="M502 390 C508 394 514 397 520 399" />
+                    <path d="M534 386 C540 390 546 393 552 395" />
+                    <path d="M566 392 C572 397 578 401 583 404" />
+                    <path d="M590 410 C595 416 600 421 603 426" />
+                    <path d="M604 438 C607 444 609 449 610 454" />
+                    <path d="M586 462 C591 458 595 454 598 450" />
+                    <path d="M560 466 C554 463 549 459 545 455" />
+                    <path d="M540 448 C546 446 551 443 555 440" />
+                    <path d="M548 420 C542 418 537 416 532 414" />
+                    <path d="M516 404 C522 402 527 400 532 399" />
+                  </g>
+                  <path class="fox-moonlight" d="M486 384 C528 372 568 374 592 394 C620 416 614 448 584 456 C558 463 534 452 530 434 C552 438 568 431 568 417 C568 397 538 388 490 400 Z" fill="url(#foxMoon)" />
+                </g>
+                <!-- The white tail tip, the marking every red fox has. -->
+                <path class="fox-tail-tip" d="M584 456 C610 449 618 424 600 402 C616 424 612 446 588 452 C578 455 570 456 562 455 C570 457 578 457 584 456 Z" />
+              </g>
+
+              <!-- Curled body: a high haunch at the rear that slopes down
+                   to the shoulder, so the fox reads as coiled rather than
+                   as a loaf. -->
+              <path class="fox-body" d="M262 404 C256 372 278 344 316 330 C356 315 404 316 444 330 C486 344 512 366 520 392 C524 408 518 420 502 426 C446 440 320 440 288 428 C270 421 262 414 262 404 Z" fill="url(#foxFur)" />
+
+              <g clip-path="url(#foxBodyClip)" aria-hidden="true">
+                <!-- Fur. A fox is defined by its coat more than its
+                     outline, and a flat gradient reads as moulded
+                     plastic. Strokes follow the curl of the body. -->
+                <g class="fox-fur">
+                  <path d="M296 356 C304 362 312 366 320 369" />
+                  <path d="M322 340 C330 347 338 351 346 354" />
+                  <path d="M352 332 C360 339 368 343 376 346" />
+                  <path d="M384 330 C392 337 400 341 408 344" />
+                  <path d="M416 336 C424 343 432 348 440 351" />
+                  <path d="M446 346 C454 353 462 358 470 362" />
+                  <path d="M472 360 C480 368 487 374 494 378" />
+                  <path d="M492 380 C499 387 505 393 510 398" />
+                  <path d="M284 380 C292 386 300 390 308 393" />
+                  <path d="M310 372 C318 379 326 383 334 386" />
+                  <path d="M340 366 C348 373 356 377 364 380" />
+                  <path d="M372 364 C380 371 388 375 396 378" />
+                  <path d="M404 368 C412 375 420 380 428 383" />
+                  <path d="M436 378 C444 385 451 390 458 394" />
+                  <path d="M466 392 C473 399 479 404 485 408" />
+                  <path d="M278 402 C286 408 294 411 302 414" />
+                  <path d="M306 398 C314 404 322 408 330 410" />
+                  <path d="M338 394 C346 400 354 404 362 406" />
+                  <path d="M370 392 C378 398 386 402 394 405" />
+                  <path d="M402 396 C410 402 418 406 426 409" />
+                  <path d="M434 404 C442 410 449 414 456 417" />
+                  <path d="M464 414 C471 420 477 424 483 427" />
+                  <path d="M300 418 C308 423 316 426 324 428" />
+                  <path d="M336 416 C344 421 352 424 360 426" />
+                  <path d="M372 414 C380 419 388 422 396 424" />
+                  <path d="M408 416 C416 421 424 424 432 427" />
+                </g>
+
+                <!-- Darker saddle over the shoulders and haunch, as a red
+                     fox has. -->
+                <path class="fox-saddle" d="M280 382 C320 340 400 322 470 348 C500 360 516 378 522 396 C512 372 486 352 448 340 C396 324 330 340 292 394 Z" />
+
+                <!-- Moonlight rim along the back, shadow along the belly. -->
+                <path class="fox-moonlight" d="M262 404 C256 372 278 344 316 330 C356 315 404 316 444 330 C486 344 512 366 520 392 C524 408 518 420 502 426 C446 440 320 440 288 428 C270 421 262 414 262 404 Z" fill="url(#foxMoon)" />
+              </g>
+
+              <!-- Pale chest and belly fur along the lower edge of the
+                   curl, catching the snow's bounce light. -->
+              <path class="fox-chest" d="M286 420 C340 438 452 440 508 422 C458 446 338 446 286 420 Z" />
+
+
+              <!-- Foreleg and paw tucked under the chin, the way a curled
+                   fox lies. Drawn with the pale paw the breed actually
+                   has, so it reads as a limb rather than a patch of
+                   shadow. -->
+              <g class="fox-foreleg">
+                <path class="fox-leg" d="M318 400 C344 392 374 396 392 408 C396 420 384 430 362 430 C336 430 320 416 318 400 Z" />
+                <path class="fox-paw" d="M318 402 C306 408 304 420 312 428 C322 434 336 432 342 425 C331 420 321 411 318 402 Z" />
+                <g class="fox-toes">
+                  <path d="M316 422 L325 418" />
+                  <path d="M324 427 L331 421" />
+                </g>
+              </g>
+
+              <g class="fox-head" id="fox-head">
+                <!-- Ears sit ON the skull, drawn before it so the skull
+                     overlaps their base — that overlap is what stops them
+                     reading as decals stuck on top. -->
+                <path class="fox-ear fox-ear--far" d="M424 286 C436 256 440 232 434 218 C414 226 394 246 382 270 Z" />
+                <path class="fox-ear-inner fox-ear-inner--far" d="M420 278 C428 256 430 240 427 232 C415 240 403 254 396 268 Z" />
+                <path class="fox-ear" d="M330 284 C316 252 314 228 321 214 C341 224 361 246 374 270 Z" />
+                <path class="fox-ear-inner" d="M336 276 C328 252 327 236 331 228 C344 238 356 254 364 270 Z" />
+
+                <!-- Skull and muzzle as ONE path. Drawing them separately
+                     is what made the old face read as a slipper stuck to
+                     a ball — the wedge has to be continuous with the
+                     head, narrowing all the way to the nose at (240,356)
+                     where the frost-breath leaves. -->
+                <path class="fox-skull" d="M318 298 C320 272 344 256 376 256 C408 256 430 274 434 302 C438 328 428 350 408 362 C388 374 360 376 338 368 C328 365 318 358 310 350 C300 354 286 360 272 366 C258 372 246 368 241 358 C236 347 242 337 254 333 C270 328 288 324 302 322 C306 313 311 304 318 298 Z" fill="url(#foxFurHead)" />
+
+                <g clip-path="url(#foxHeadClip)" aria-hidden="true">
+                  <g class="fox-fur fox-fur--head">
+                    <path d="M332 292 C339 297 346 300 353 302" />
+                    <path d="M358 278 C365 283 372 286 379 288" />
+                    <path d="M386 274 C393 279 400 282 407 284" />
+                    <path d="M410 288 C417 294 423 299 428 303" />
+                    <path d="M326 318 C333 323 340 326 347 328" />
+                    <path d="M354 310 C361 315 368 318 375 320" />
+                    <path d="M384 306 C391 311 398 314 405 316" />
+                    <path d="M414 316 C420 322 426 327 431 331" />
+                    <path d="M344 340 C351 345 358 348 365 350" />
+                    <path d="M374 336 C381 341 388 344 395 346" />
+                    <path d="M404 340 C410 346 416 350 421 353" />
+                  </g>
+                  <path class="fox-moonlight" d="M318 298 C320 272 344 256 376 256 C408 256 430 274 434 302 C438 328 428 350 408 362 C388 374 360 376 338 368 C328 365 318 358 310 350 C300 354 286 360 272 366 C258 372 246 368 241 358 C236 347 242 337 254 333 C270 328 288 324 302 322 C306 313 311 304 318 298 Z" fill="url(#foxMoon)" />
+                </g>
+
+
+                <!-- Pale muzzle bridge, continuous with the wedge and
+                     tapering to the nose. This is where frost-breath
+                     leaves. -->
+                <path class="fox-muzzle" d="M250 338 C266 330 286 325 302 322 C310 332 310 348 302 356 C286 362 268 367 254 368 C243 364 242 348 250 338 Z" />
+
+                <ellipse class="fox-eye" cx="340" cy="312" rx="7.5" ry="8" transform="rotate(-16 340 312)" />
+                <ellipse class="fox-eye" cx="392" cy="306" rx="7.5" ry="8" transform="rotate(-16 392 306)" />
+                <circle class="fox-eye-shine" cx="338" cy="309" r="2.5" />
+                <circle class="fox-eye-shine" cx="390" cy="303" r="2.5" />
+
+                <!-- Dark brow flashes, the markings that make a fox face
+                     read as a fox rather than a generic dog. -->
+                <path class="fox-brow" d="M324 296 C336 288 352 287 364 292 C350 292 334 295 324 301 Z" />
+                <path class="fox-brow" d="M408 290 C398 283 384 282 374 286 C386 287 398 290 406 296 Z" />
+
+                <ellipse class="fox-nose" cx="245" cy="350" rx="9" ry="7.5" transform="rotate(-20 245 350)" />
+                <path class="fox-nose-line" d="M249 357 C251 361 253 364 256 366" />
+              </g>
+            </g>
+
+            <!-- Frost breath from the muzzle. Drawn above the fox so the
+                 puffs read in front of the face, not behind it. -->
+            <g class="mist-layer" id="mist-layer-fox" aria-hidden="true"></g>
+          </g>
+
+          <g id="foreground">
+            <!-- Snow banked against the fox, drawn over its lower edge so
+                 the animal is bedded into the field rather than resting
+                 on top of it. -->
+            <path class="fox-snow-lip" d="M256 432 C310 450 348 456 400 456 C458 456 506 450 550 434 C526 458 458 470 396 470 C334 470 282 458 256 432 Z" aria-hidden="true" />
+
+            <!-- Foreground drifts, lighter and softer than the field, to
+                 hold the bottom corners. -->
+            <path class="snow-bank" d="M-200 470 C-80 440 40 436 150 456 C230 470 280 484 320 500 L-200 500 Z" fill="url(#snowNear)" />
+            <path class="snow-bank" d="M1000 462 C880 434 760 434 660 458 C580 477 530 488 496 500 L1000 500 Z" fill="url(#snowNear)" />
+          </g>
         </svg>
 
         <!-- Fireflies live outside the SVG so they can be positioned in

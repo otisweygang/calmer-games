@@ -329,7 +329,7 @@ const EMITTERS = {
     // Bubbles leave the blowhole and rise toward the surface.
     cls: "bubble",
     cx: 336 + (Math.random() * 16 - 8),
-    cy: 242 + Math.random() * 6,
+    cy: 236 + Math.random() * 6,
     r: 5 + Math.random() * 11,
     fill: "url(#bubbleFill)",
     mx: Math.random() * 70 - 35,
@@ -341,7 +341,7 @@ const EMITTERS = {
     const spread = Math.random() * 40 - 20;
     return {
       cls: "mist-puff",
-      cx: 206 + Math.random() * 10,
+      cx: 240 + Math.random() * 10,
       cy: 356 + Math.random() * 8,
       r: 11 + Math.random() * 11,
       fill: "url(#frostPuff)",
