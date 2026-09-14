@@ -45,13 +45,14 @@ html, body {
   text-decoration: none;
   background: var(--panel);
   border: 1px solid var(--panel-border);
-  border-radius: 8px;
-  transition: transform 0.15s ease;
+  border-radius: 12px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 #ls-exit:hover,
 #ls-exit:focus-visible {
-  transform: scale(1.03);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 8px 16px rgba(0, 0, 0, 0.25);
 }
 
 #ls-exit:focus-visible {
@@ -90,11 +91,11 @@ html, body {
   justify-content: center;
   background: var(--panel);
   border: 1px solid var(--panel-border);
-  border-radius: 10px;
+  border-radius: 12px;
   color: var(--ink);
   opacity: 0.85;
   cursor: pointer;
-  transition: opacity 0.2s ease, transform 0.15s ease;
+  transition: opacity 0.2s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .icon-btn svg {
@@ -105,7 +106,8 @@ html, body {
 .icon-btn:hover,
 .icon-btn:focus-visible {
   opacity: 1;
-  transform: scale(1.08);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 8px 16px rgba(0, 0, 0, 0.25);
 }
 
 .icon-btn:focus-visible {
@@ -259,8 +261,9 @@ html, body {
   color: var(--ink);
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--panel-border);
-  border-radius: 12px;
+  border-radius: 14px;
   cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -273,6 +276,8 @@ html, body {
 .tc-btn:hover,
 .tc-btn:focus-visible {
   background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 8px 16px rgba(0, 0, 0, 0.25);
 }
 
 .tc-btn:active {
@@ -340,15 +345,18 @@ html, body {
   color: var(--ink);
   background: transparent;
   border: 1px solid var(--panel-border);
-  border-radius: 8px;
+  border-radius: 14px;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease,
+    transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .modal-btn:hover,
 .modal-btn:focus-visible {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 8px 16px rgba(0, 0, 0, 0.25);
 }
 
 .modal-btn:focus-visible {
@@ -440,14 +448,17 @@ html, body {
   color: var(--ink-soft);
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--panel-border);
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
 .menu-close-btn:hover,
 .menu-close-btn:focus-visible {
   color: var(--ink);
   background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 8px 16px rgba(0, 0, 0, 0.25);
 }
 
 .menu-close-btn:focus-visible {
@@ -523,13 +534,16 @@ html, body {
   color: var(--ink);
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--panel-border);
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
 .menu-secondary-btn:hover,
 .menu-secondary-btn:focus-visible {
   background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3), 0 8px 16px rgba(0, 0, 0, 0.25);
 }
 
 .menu-secondary-btn:focus-visible {

@@ -59,9 +59,16 @@ body {
   text-decoration: none;
   background: #ffffff;
   border: 1px solid var(--card-border);
-  border-radius: 12px;
-  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(58, 54, 48, 0.06), 0 6px 14px rgba(58, 54, 48, 0.08);
   cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+#ls-exit:hover,
+#ls-exit:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(58, 54, 48, 0.08), 0 10px 20px rgba(58, 54, 48, 0.12);
 }
 
 .screen {
@@ -122,16 +129,16 @@ body {
   color: #ffffff;
   background: var(--ink);
   border: none;
-  border-radius: 14px;
+  border-radius: 16px;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.2);
+  box-shadow: 0 1px 2px rgba(58, 54, 48, 0.15), 0 6px 16px rgba(58, 54, 48, 0.2);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .play-btn:hover,
 .play-btn:focus-visible {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(58, 54, 48, 0.25);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(58, 54, 48, 0.18), 0 12px 26px rgba(58, 54, 48, 0.25);
 }
 
 .play-btn:focus-visible {
@@ -159,8 +166,9 @@ body {
   color: var(--ink-soft);
   background: #ffffff;
   border: 1px solid var(--card-border);
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .menu-btn:hover,
@@ -168,7 +176,8 @@ body {
 .new-puzzle-btn:hover,
 .new-puzzle-btn:focus-visible {
   color: var(--ink);
-  box-shadow: 0 4px 10px rgba(58, 54, 48, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(58, 54, 48, 0.06), 0 8px 16px rgba(58, 54, 48, 0.1);
 }
 
 .menu-btn:focus-visible,
@@ -247,14 +256,16 @@ body {
   color: var(--ink-soft);
   background: var(--bg);
   border: 1px solid var(--card-border);
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .menu-close-btn:hover,
 .menu-close-btn:focus-visible {
   color: var(--ink);
-  box-shadow: 0 4px 10px rgba(58, 54, 48, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(58, 54, 48, 0.06), 0 8px 16px rgba(58, 54, 48, 0.1);
 }
 
 .menu-close-btn:focus-visible {
@@ -453,9 +464,9 @@ body {
   color: var(--ink);
   background: #ffffff;
   border: 1px solid var(--card-border);
-  border-radius: 12px;
+  border-radius: 14px;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(58, 54, 48, 0.08);
+  box-shadow: 0 1px 2px rgba(58, 54, 48, 0.06), 0 6px 14px rgba(58, 54, 48, 0.08);
   transition: transform 0.15s ease, box-shadow 0.15s ease,
     background-color 0.15s ease;
   -webkit-tap-highlight-color: transparent;
@@ -465,7 +476,7 @@ body {
 .pad-btn:hover,
 .pad-btn:focus-visible {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(58, 54, 48, 0.12);
+  box-shadow: 0 4px 8px rgba(58, 54, 48, 0.08), 0 12px 22px rgba(58, 54, 48, 0.12);
 }
 
 .pad-btn:active {
