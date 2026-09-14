@@ -59,6 +59,7 @@ const els = {
   list: document.getElementById("place-list"),
   quizBanner: document.getElementById("quiz-banner"),
   quizTarget: document.getElementById("quiz-target"),
+  quizHintBtn: document.getElementById("quiz-hint-btn"),
   quizSkipBtn: document.getElementById("quiz-skip-btn"),
 };
 
@@ -148,6 +149,10 @@ const DEFAULT_COLOR = new THREE.Color(0x3c7a52);
 const HOVER_COLOR = new THREE.Color(0x5aa06e);
 const SELECTED_COLOR = new THREE.Color(0x7bd3c0);
 const WRONG_FLASH_COLOR = new THREE.Color(0xd98a5f);
+// Second-press hint highlight, kept visually distinct from SELECTED_COLOR
+// (shown after a correct guess) so a hinted-but-not-yet-tapped country
+// never reads as already found.
+const HINT_COLOR = new THREE.Color(0xe0c15c);
 
 // Earcut triangulates in flat lon/lat space, then each triangle is lifted
 // onto the sphere per-vertex - fine for small triangles, but ear-clipping
@@ -318,6 +323,10 @@ function updateOceanLabelPositions() {
 
 let hoveredEntry = null;
 let selectedEntry = null;
+// Set by the quiz hint button (second press) to the current quiz target,
+// so it stays highlighted through hover changes until it's tapped, the
+// target changes, or quiz mode ends.
+let hintedEntry = null;
 
 function setMeshColor(entry, color) {
   entry.mesh.material.color.set(color);
@@ -328,6 +337,8 @@ function refreshCountryColor(entry) {
     setMeshColor(entry, SELECTED_COLOR);
   } else if (entry === selectedEntry) {
     setMeshColor(entry, SELECTED_COLOR);
+  } else if (entry === hintedEntry) {
+    setMeshColor(entry, HINT_COLOR);
   } else if (entry === hoveredEntry) {
     setMeshColor(entry, HOVER_COLOR);
   } else {
@@ -374,14 +385,27 @@ function showFeedback(text, kind) {
 
 let quizPool = [];
 let quizTarget = null;
+// 0 = not used yet, 1 = globe has been rotated to face the target,
+// 2 = target is also highlighted. Resets whenever the target changes.
+let hintLevel = 0;
 
 function buildQuizPool() {
   quizPool = countryMeshes.map((e) => e.name);
   if (state.showOceans) quizPool.push(...oceanLabels.map((o) => o.name));
 }
 
+function clearHint() {
+  hintLevel = 0;
+  if (hintedEntry) {
+    const prev = hintedEntry;
+    hintedEntry = null;
+    if (!isOceanEntry(prev)) refreshCountryColor(prev);
+  }
+}
+
 function pickQuizTarget() {
   if (quizPool.length === 0) return;
+  clearHint();
   const name = quizPool[Math.floor(Math.random() * quizPool.length)];
   quizTarget = name;
   els.quizTarget.textContent = name;
@@ -393,6 +417,24 @@ function findEntryByName(name) {
 
 function isOceanEntry(entry) {
   return oceanLabels.includes(entry);
+}
+
+// First press: rotate the globe to face the target, without revealing
+// which shape it is. Second press (same target): also highlight it, so a
+// player who's still stuck knows exactly what to tap.
+function useHint() {
+  const entry = findEntryByName(quizTarget);
+  if (!entry) return;
+  animateCameraTo(entry.centroid);
+  if (hintLevel === 0) {
+    hintLevel = 1;
+  } else {
+    hintLevel = 2;
+    if (!isOceanEntry(entry)) {
+      hintedEntry = entry;
+      refreshCountryColor(entry);
+    }
+  }
 }
 
 function handleQuizGuess(entry) {
@@ -427,6 +469,7 @@ function setQuizMode(on) {
     pickQuizTarget();
     setSelected(null);
   } else {
+    clearHint();
     els.feedback.classList.remove("show");
   }
 }
@@ -612,6 +655,7 @@ function init() {
   });
 
   els.modeBtn.addEventListener("click", () => setQuizMode(!state.quizMode));
+  els.quizHintBtn.addEventListener("click", () => useHint());
   els.quizSkipBtn.addEventListener("click", () => pickQuizTarget());
 
   els.canvas.addEventListener("pointerdown", onPointerDown);

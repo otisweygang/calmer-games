@@ -153,6 +153,7 @@ html, body {
   color: var(--accent);
 }
 
+#quiz-hint-btn,
 #quiz-skip-btn {
   min-height: 36px;
   padding: 4px 14px;
@@ -167,11 +168,14 @@ html, body {
   transition: background 0.15s ease;
 }
 
+#quiz-hint-btn:hover,
+#quiz-hint-btn:focus-visible,
 #quiz-skip-btn:hover,
 #quiz-skip-btn:focus-visible {
   background: rgba(255, 255, 255, 0.1);
 }
 
+#quiz-hint-btn:focus-visible,
 #quiz-skip-btn:focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 2px;
