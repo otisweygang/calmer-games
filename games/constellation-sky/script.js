@@ -108,10 +108,15 @@ function vector3ToRaDec(v) {
 }
 
 // Real magnitude-to-visual-size curve (flux-based, not linear) so
-// bright named stars stand out clearly from the faint background.
+// bright named stars stand out clearly from the faint background. Floor
+// raised from the original 0.9 - the catalog's faintest stars (median mag
+// ~2.9) were rendering under 2px and reading as near-invisible on real
+// screens, especially at low brightness/contrast settings. Bright stars
+// keep their existing sizes; only the dim end is lifted, so relative
+// brightness - the whole point of a flux-based curve - is preserved.
 function starPointSize(mag) {
   const relFlux = Math.pow(10, -0.4 * mag);
-  return Math.max(0.9, 3.4 * Math.pow(relFlux, 0.4) * 1.6);
+  return Math.max(3.2, 3.4 * Math.pow(relFlux, 0.4) * 1.6);
 }
 
 // ---------- Scene setup ----------
@@ -126,7 +131,9 @@ camera.updateProjectionMatrix();
 const renderer = new THREE.WebGLRenderer({ canvas: els.canvas, antialias: true, alpha: false });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor(0x000000, 1);
+// Very dark navy rather than pure black - still reads as night sky but
+// gives faint stars a hair more contrast to sit against.
+renderer.setClearColor(0x05070d, 1);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -203,9 +210,15 @@ function buildStarField() {
         float d = length(uv) * 2.0;
         float glow = exp(-4.0 * d * d);
         float core = exp(-40.0 * d * d);
-        float alpha = glow * 0.6 + core;
+        // Floored so even a star at the size floor above still has a
+        // solid, clearly-visible core instead of fading to a faint wisp.
+        float alpha = min(1.0, max(glow * 0.6 + core, 0.7 * core + glow * 0.45));
         if (alpha < 0.02) discard;
-        gl_FragColor = vec4(vColor * (0.7 + core * 0.3), alpha);
+        // Colour boosted (not just alpha) so faint stars glow rather than
+        // read as flat, dim dots - 0.85 floor keeps bright-star contrast
+        // (their core still hits the full 1.0 boost) while lifting the
+        // faint end well off the old ~0.7 floor.
+        gl_FragColor = vec4(vColor * (0.85 + core * 0.15), alpha);
       }
     `,
     vertexColors: true,
