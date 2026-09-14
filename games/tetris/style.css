@@ -151,12 +151,40 @@ html, body {
   padding: 120px 16px 190px;
 }
 
+/* Sized to exactly match #board-canvas (an inline-block wrapper shrinks
+   to its content), so #start-panel's inset:0 covers precisely the board
+   and nothing more. */
+#board-stack {
+  position: relative;
+  display: inline-block;
+}
+
 #board-canvas {
   display: block;
   background: var(--board-bg);
   border: 1px solid var(--panel-border);
   border-radius: 10px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
+#start-panel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 7, 12, 0.82);
+  border-radius: 10px;
+}
+
+#start-panel[hidden] {
+  display: none;
+}
+
+#start-btn {
+  min-width: 140px;
+  min-height: 52px;
+  font-size: 1.1rem;
 }
 
 /* Anchored to the viewport edge rather than beside the board, so it

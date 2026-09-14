@@ -75,6 +75,8 @@ const els = {
   nextCanvas: document.getElementById("next-canvas"),
   fullBoardPanel: document.getElementById("full-board-panel"),
   resetBtn: document.getElementById("reset-btn"),
+  startPanel: document.getElementById("start-panel"),
+  startBtn: document.getElementById("start-btn"),
   menuBtn: document.getElementById("menu-btn"),
   menuResetBtn: document.getElementById("menu-reset-btn"),
   menuBackdrop: document.getElementById("menu-backdrop"),
@@ -123,9 +125,18 @@ let nextName = randomShapeName();
 let linesCleared = 0;
 let dropTimer = null;
 let boardFull = false;
+// True once the player has pressed Start (or resumed a board with real
+// progress on it already - see init()). Nothing falls and no input does
+// anything until then, so the board sits still behind the Start overlay
+// instead of a piece already dropping under it.
+let started = false;
 
 function makeEmptyGrid() {
   return Array.from({ length: ROWS }, () => new Array(COLS).fill(null));
+}
+
+function isEmptyGrid(g) {
+  return g.every((row) => row.every((cell) => cell === null));
 }
 
 function randomShapeName() {
@@ -243,7 +254,7 @@ function hardDrop() {
 
 function resetDropTimer() {
   clearInterval(dropTimer);
-  if (!boardFull) {
+  if (!boardFull && started) {
     dropTimer = setInterval(softDrop, DROP_MS);
   }
 }
@@ -443,7 +454,7 @@ function closeMenuDrawer() {
 // ---------- Input ----------
 
 document.addEventListener("keydown", (e) => {
-  if (boardFull) return;
+  if (boardFull || !started) return;
   switch (e.key) {
     case "ArrowLeft":
     case "a":
@@ -478,27 +489,43 @@ function bindHold(el, action) {
   // Single tap/click performs the action once - held-down repeat isn't
   // needed here since there's no time pressure to justify it.
   el.addEventListener("click", () => {
-    if (boardFull) return;
+    if (boardFull || !started) return;
     action();
   });
+}
+
+// Called once, either by clicking the Start overlay or automatically at
+// init when a saved board already has real progress on it (a refresh or
+// reconnect should never cost progress or force an extra tap).
+function startGame() {
+  if (started) return;
+  started = true;
+  els.startPanel.hidden = true;
+  if (!current) spawnPiece();
+  resetDropTimer();
 }
 
 function init() {
   sizeCanvases();
 
   const saved = loadState();
+  let resumingProgress = false;
   if (saved) {
     grid = saved.grid;
     nextName = saved.nextName;
     linesCleared = saved.linesCleared || 0;
     if (typeof saved.showScore === "boolean") settings.showScore = saved.showScore;
+    resumingProgress = !isEmptyGrid(grid);
   }
 
   applyScoreVisibility();
   updateScoreDisplay();
-  spawnPiece();
-  resetDropTimer();
   requestAnimationFrame(render);
+
+  els.startBtn.addEventListener("click", startGame);
+  if (resumingProgress) {
+    startGame();
+  }
 
   bindHold(document.getElementById("tc-left"), () => tryMove(-1, 0));
   bindHold(document.getElementById("tc-right"), () => tryMove(1, 0));
@@ -523,7 +550,10 @@ function init() {
 
   window.addEventListener("resize", () => {
     sizeCanvases();
-    drawNext();
+    // Only redraw the preview if the game has actually started - drawing
+    // it before Start would reveal the next piece through/around the
+    // start overlay on resize.
+    if (started) drawNext();
   });
 }
 

@@ -26,7 +26,12 @@
   </div>
 
   <main id="board-wrap">
-    <canvas id="board-canvas" aria-label="Tetris board"></canvas>
+    <div id="board-stack">
+      <canvas id="board-canvas" aria-label="Tetris board"></canvas>
+      <div id="start-panel">
+        <button id="start-btn" type="button" class="modal-btn modal-btn-primary">Start</button>
+      </div>
+    </div>
     <div id="next-wrap" aria-label="Next shape">
       <span id="next-label">Next</span>
       <canvas id="next-canvas"></canvas>
