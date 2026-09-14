@@ -1,0 +1,6 @@
+{
+  "title": "Tetris",
+  "description": "Fit the falling shapes together. No timer, no speed-up, score optional.",
+  "entry": "index.html",
+  "thumbnail": "thumbnail.png"
+}
