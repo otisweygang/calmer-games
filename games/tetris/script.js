@@ -88,7 +88,7 @@ const nextCtx = els.nextCanvas.getContext("2d");
 // ---------- Settings ----------
 
 function defaultSettings() {
-  return { showScore: true };
+  return { showScore: false };
 }
 
 function loadSettings() {
