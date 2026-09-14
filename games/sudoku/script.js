@@ -163,7 +163,9 @@ function renderBoard() {
   }
 }
 
-function renderNumberPad() {
+// The pad's buttons are built once and then only updated, so pressing a
+// number never rebuilds the element under the player's finger.
+function buildNumberPad() {
   const pad = document.getElementById("number-pad");
   pad.innerHTML = "";
 
@@ -171,6 +173,7 @@ function renderNumberPad() {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "pad-btn";
+    btn.dataset.digit = String(digit);
     btn.textContent = String(digit);
     btn.setAttribute("aria-label", `Enter ${digit}`);
     btn.addEventListener("click", () => {
@@ -182,12 +185,52 @@ function renderNumberPad() {
   const eraser = document.createElement("button");
   eraser.type = "button";
   eraser.className = "pad-btn pad-btn-eraser";
+  eraser.dataset.eraser = "true";
   eraser.textContent = "Erase";
   eraser.setAttribute("aria-label", "Erase cell");
   eraser.addEventListener("click", () => {
     if (selectedIndex !== null) setEntry(selectedIndex, sudoku.BLANK_CHAR);
   });
   pad.appendChild(eraser);
+}
+
+// How many of each digit are currently on the board (givens + entries).
+function digitCounts() {
+  const counts = new Array(10).fill(0);
+  for (let i = 0; i < 81; i++) {
+    const ch = puzzle[i] !== sudoku.BLANK_CHAR ? puzzle[i] : entries[i];
+    const n = Number(ch);
+    if (n >= 1 && n <= 9) counts[n]++;
+  }
+  return counts;
+}
+
+function renderNumberPad() {
+  const pad = document.getElementById("number-pad");
+  if (!pad.children.length) buildNumberPad();
+
+  const hasSelection = selectedIndex !== null;
+  const counts = digitCounts();
+  const selectedIsGiven =
+    hasSelection && puzzle[selectedIndex] !== sudoku.BLANK_CHAR;
+  const canType = hasSelection && !selectedIsGiven;
+
+  for (const btn of pad.children) {
+    if (btn.dataset.eraser) {
+      const hasEntry = canType && entries[selectedIndex] !== sudoku.BLANK_CHAR;
+      btn.disabled = !hasEntry;
+      continue;
+    }
+
+    const digit = Number(btn.dataset.digit);
+    const done = counts[digit] >= 9;
+    btn.disabled = !canType;
+    btn.classList.toggle("pad-btn-done", done);
+    btn.setAttribute(
+      "aria-label",
+      done ? `Enter ${digit}, all placed` : `Enter ${digit}`
+    );
+  }
 }
 
 function render() {

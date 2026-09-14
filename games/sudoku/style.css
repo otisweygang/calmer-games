@@ -14,6 +14,12 @@
   --given-bg: #f1ece0;
   --selected-bg: #e4efec;
   --conflict-outline: #6b6459;
+
+  /* One fluid cell size drives both the board and the number pad, so the
+     two always line up and the pad never reflows. 9 cells + 8 gaps + the
+     board border and panel padding must fit inside the viewport. */
+  --cell: clamp(28px, calc((100vw - 76px) / 9), 46px);
+  --board-w: calc(var(--cell) * 9 + 8px + 4px);
 }
 
 html, body {
@@ -136,9 +142,11 @@ body {
 .play-toolbar {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   flex-wrap: wrap;
   gap: 10px;
+  width: var(--board-w);
+  max-width: 100%;
 }
 
 .menu-btn,
@@ -341,8 +349,8 @@ body {
 
 .board {
   display: grid;
-  grid-template-columns: repeat(9, minmax(28px, 44px));
-  grid-template-rows: repeat(9, minmax(28px, 44px));
+  grid-template-columns: repeat(9, var(--cell));
+  grid-template-rows: repeat(9, var(--cell));
   gap: 1px;
   background: var(--ink);
   border: 2px solid var(--ink);
@@ -359,7 +367,7 @@ body {
   height: 100%;
   padding: 0;
   font-family: "Nunito", system-ui, sans-serif;
-  font-size: 1.15rem;
+  font-size: clamp(1rem, calc(var(--cell) * 0.5), 1.35rem);
   font-weight: 600;
   color: var(--ink);
   background: #ffffff;
@@ -415,28 +423,43 @@ body {
   border: 1.5px solid var(--conflict-outline);
 }
 
-.number-pad {
+/* A fixed 5-column grid: digits 1-5 on the top row, 6-9 + Erase on the
+   bottom. Never reflows, and matches the board's width exactly so the two
+   read as one control surface. */
+.number-pad-wrap {
   display: flex;
-  flex-wrap: wrap;
   justify-content: center;
+  width: 100%;
+}
+
+.number-pad {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
   gap: 8px;
-  max-width: 420px;
+  width: var(--board-w);
+  max-width: 100%;
 }
 
 .pad-btn {
-  min-width: 44px;
-  min-height: 44px;
-  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 6px 4px;
   font-family: "Baloo 2", "Nunito", sans-serif;
-  font-size: 1.1rem;
+  font-size: clamp(1.05rem, calc(var(--cell) * 0.52), 1.35rem);
   font-weight: 700;
+  line-height: 1;
   color: var(--ink);
   background: #ffffff;
   border: 1px solid var(--card-border);
   border-radius: 12px;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(58, 54, 48, 0.08);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+    background-color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .pad-btn:hover,
@@ -445,14 +468,40 @@ body {
   box-shadow: 0 8px 20px rgba(58, 54, 48, 0.12);
 }
 
+.pad-btn:active {
+  transform: translateY(0);
+  background: var(--selected-bg);
+  box-shadow: 0 2px 8px rgba(58, 54, 48, 0.1);
+}
+
 .pad-btn:focus-visible {
   outline: 3px solid var(--ink);
   outline-offset: 2px;
 }
 
+/* No cell chosen yet: the pad is inert, and says so by looking inert
+   rather than by moving or disappearing. */
+.pad-btn:disabled {
+  cursor: default;
+  opacity: 0.4;
+  box-shadow: none;
+  transform: none;
+}
+
+/* All nine of a digit already placed. Dimmed and struck through, so the
+   cue is never colour alone. */
+.pad-btn-done {
+  color: var(--ink-soft);
+  background: var(--given-bg);
+  text-decoration: line-through;
+  box-shadow: none;
+}
+
 .pad-btn-eraser {
+  grid-column: span 1;
   font-family: "Nunito", system-ui, sans-serif;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 700;
 }
 
 #status {
